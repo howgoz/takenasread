@@ -3,233 +3,131 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Taken as Read</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
-    
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    h1, h2, nav a {
-      font-family: 'Inter', system-ui, sans-serif;
-      font-weight: 300;
-      letter-spacing: 0.05em;
-    }
+  <title>Taken as Read — Photography</title>
+  <meta name="description" content="Taken as Read Photography — commercial and artistic photography.">
+  <meta name="theme-color" content="#0a0a0b">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://howgoz.github.io/takenasread/">
 
-    .hero { 
-      background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('images/background.JPG'); 
-      background-size: cover; 
-      background-position: center; 
-    }
-    .photo-grid img { transition: all 0.4s; }
-    .photo-grid img:hover { transform: scale(1.04); }
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Taken as Read — Photography">
+  <meta property="og:description" content="Taken as Read Photography — commercial and artistic photography.">
+  <meta property="og:image" content="images/hero/hero-01.jpg">
+  <meta property="og:url" content="https://howgoz.github.io/takenasread/">
+  <meta name="twitter:card" content="summary_large_image">
 
-    /* Mobile Menu */
-    .nav-links {
-      transition: all 0.4s ease;
-    }
-    @media (max-width: 768px) {
-      .nav-links {
-        position: fixed;
-        top: 76px;
-        left: -100%;
-        width: 100%;
-        height: calc(100vh - 76px);
-        background: #09090b;
-        flex-direction: column;
-        padding-top: 3rem;
-        gap: 2rem;
-      }
-      .nav-links.active { left: 0; }
-    }
-
-    /* Improved Lightbox */
-    #lightbox {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.98);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    #lightbox.active {
-      opacity: 1;
-    }
-    #lightbox-image {
-      max-width: 92%;
-      max-height: 92vh;
-      border: 12px solid white;
-      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.6);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: zoom-in;
-    }
-    #lightbox-image.zoomed {
-      transform: scale(1.18);
-      cursor: zoom-out;
-    }
-    .close {
-      position: absolute;
-      top: 25px;
-      right: 30px;
-      font-size: 42px;
-      color: white;
-      cursor: pointer;
-      z-index: 10;
-      transition: all 0.3s;
-    }
-    .close:hover {
-      transform: rotate(90deg);
-      color: #fcd34d;
-    }
-  </style>
+  <link rel="preload" href="fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-zinc-950 text-white">
+<body class="bg-ink text-paper">
 
   <!-- Navigation -->
-  <nav class="fixed top-0 w-full bg-black/95 backdrop-blur-md z-50">
+  <nav id="site-nav" class="fixed top-0 w-full z-50 transition-colors duration-500 border-b border-white/0">
     <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
-      <h1 class="text-2xl tracking-widest">TAKEN AS READ</h1>
-      
-      <!-- Desktop Menu -->
-      <div class="hidden md:flex space-x-8 text-sm">
-        <a href="#commercial" class="hover:text-amber-400 transition">Commercial</a>
-        <a href="#artistic" class="hover:text-amber-400 transition">Artistic</a>
-        <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
+      <a href="#top" class="brand text-xl tracking-widest2">TAKEN AS READ</a>
+
+      <div class="hidden md:flex items-center space-x-10">
+        <a href="#commercial" class="nav-link">Commercial</a>
+        <a href="#artistic" class="nav-link">Artistic</a>
+        <a href="#contact" class="nav-link">Contact</a>
       </div>
 
-      <!-- Mobile Hamburger -->
-      <button id="menu-btn" class="md:hidden text-3xl focus:outline-none">
-        <i class="fas fa-bars"></i>
+      <button id="menu-btn" class="md:hidden relative w-8 h-6" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger-line line-1 absolute left-0 top-0 w-8 h-px bg-white"></span>
+        <span class="hamburger-line line-2 absolute left-0 top-1/2 -translate-y-1/2 w-8 h-px bg-white"></span>
+        <span class="hamburger-line line-3 absolute left-0 bottom-0 w-8 h-px bg-white"></span>
       </button>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="nav-links hidden md:hidden flex flex-col items-center text-lg">
-      <a href="#commercial" class="hover:text-amber-400">Commercial</a>
-      <a href="#artistic" class="hover:text-amber-400">Artistic</a>
-      <a href="#contact" class="hover:text-amber-400">Contact</a>
+    <div id="mobile-menu" class="nav-links md:hidden">
+      <a href="#commercial" class="text-xl tracking-wide">Commercial</a>
+      <a href="#artistic" class="text-xl tracking-wide">Artistic</a>
+      <a href="#contact" class="text-xl tracking-wide">Contact</a>
     </div>
   </nav>
 
   <!-- Hero -->
-  <section class="hero h-screen flex items-center justify-center text-center">
-    <div>
-      <h2 class="text-5xl md:text-7xl font-light mb-4">Taken as Read</h2>
-      <p class="text-xl text-zinc-300">Photography</p>
+  <section id="top" class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+    <div class="hero-bg absolute inset-0">
+      <img id="hero-layer-a" class="hero-layer" alt="" fetchpriority="high">
+      <img id="hero-layer-b" class="hero-layer" alt="">
     </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/80"></div>
+    <div class="relative z-10 px-6">
+      <h2 class="text-6xl md:text-8xl font-light mb-5 tracking-wide">Taken as Read</h2>
+      <p class="text-lg md:text-xl text-zinc-300 tracking-[0.3em] uppercase">Photography</p>
+    </div>
+    <a href="#commercial" class="scroll-cue absolute bottom-10 left-1/2 -translate-x-1/2 z-10 text-zinc-300" aria-label="Scroll to work">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 4v14M6 12l6 6 6-6"/>
+      </svg>
+    </a>
   </section>
 
   <!-- Commercial Work -->
-  <section id="commercial" class="max-w-6xl mx-auto px-6 py-20">
-    <h2 class="text-4xl font-light mb-12 text-center">Commercial Work</h2>
-    <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="commercial-grid"></div>
+  <section id="commercial" class="max-w-6xl mx-auto px-6 py-24 md:py-32">
+    <div class="reveal mb-14">
+      <span class="section-kicker">Portfolio</span>
+      <h2 class="section-heading">Commercial Work</h2>
+    </div>
+    <div class="masonry reveal-stagger columns-1 sm:columns-2 lg:columns-3" id="commercial-grid"></div>
   </section>
 
   <!-- Artistic Work -->
-  <section id="artistic" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
-    <h2 class="text-4xl font-light mb-12 text-center">Artistic Work</h2>
-    <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="artistic-grid"></div>
+  <section id="artistic" class="bg-zinc-950/60 border-y border-white/5">
+    <div class="max-w-6xl mx-auto px-6 py-24 md:py-32">
+      <div class="reveal mb-14">
+        <span class="section-kicker">Portfolio</span>
+        <h2 class="section-heading">Artistic Work</h2>
+      </div>
+      <div class="masonry reveal-stagger columns-1 sm:columns-2 lg:columns-3" id="artistic-grid"></div>
+    </div>
   </section>
 
   <!-- Contact -->
-  <section id="contact" class="max-w-6xl mx-auto px-6 py-20 text-center">
-    <h2 class="text-4xl font-light mb-8">Get in Touch</h2>
-    <p class="text-zinc-400 mb-8">Interested in working together?</p>
-    <a href="mailto:takenasread@photographer.net" class="inline-block bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-amber-400 transition">
+  <section id="contact" class="max-w-3xl mx-auto px-6 py-24 md:py-32 text-center reveal">
+    <span class="section-kicker">Say hello</span>
+    <h2 class="section-heading mb-6">Get in Touch</h2>
+    <p class="text-zinc-400 mb-10">Interested in working together?</p>
+    <a href="mailto:takenasread@photographer.net" class="btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 6 12 13 2 6"/>
+        <path d="M2 6h20v12H2z"/>
+      </svg>
       Send me an email
     </a>
-    <p class="mt-10 text-zinc-500">takenasread@photographer.net</p>
+    <p class="mt-8 text-zinc-500 tracking-wide">takenasread@photographer.net</p>
   </section>
 
-  <footer class="text-center py-10 text-zinc-500 text-sm">
+  <footer class="text-center py-10 text-zinc-500 text-sm border-t border-white/5">
     © Taken as Read Photography
   </footer>
 
+  <!-- Back to top -->
+  <button id="back-to-top" class="lb-control fixed bottom-6 right-6 z-40 opacity-0" style="transform: translateY(12px);" aria-label="Back to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 19V5M5 12l7-7 7 7"/>
+    </svg>
+  </button>
+
   <!-- Lightbox -->
-  <div id="lightbox">
-    <span class="close" onclick="closeLightbox()">×</span>
-    <img id="lightbox-image" src="" alt="" onclick="toggleZoom()">
+  <div id="lightbox" class="fixed inset-0 z-[1000] hidden items-center justify-center">
+    <button id="lightbox-close" class="lb-control absolute top-6 right-6" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <button id="lightbox-prev" class="lb-control absolute left-4 md:left-8 top-1/2 -translate-y-1/2" aria-label="Previous image">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button id="lightbox-next" class="lb-control absolute right-4 md:right-8 top-1/2 -translate-y-1/2" aria-label="Next image">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <img id="lightbox-image" src="" alt="" class="max-w-[92%] max-h-[86vh] shadow-2xl">
+    <div id="lightbox-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-sm text-zinc-400 tracking-widest"></div>
   </div>
 
-  <script>
-    // Your photos
-    const commercialPhotos = [
-      "bdance5.jpg", "blackford.JPG", "Blackford_Pavilion_Pergola.JPG", "dance.JPG",
-      "Fire_Hydrant_Three.JPG", "St Roque.JPG", "wedding.JPG"
-    ];
-
-    const artisticPhotos = [
-      "flowers (1).JPG", "flowers (2).JPG", "modern1 (1).jpg", "modern1 (2).JPG",
-      "water (1).JPG", "water (2).JPG", "water (3).JPG", "water (4).JPG",
-      "water (5).JPG"
-    ];
-
-    function createGallery(sectionId, photos, folder) {
-      const container = document.getElementById(sectionId);
-      container.innerHTML = '';
-      photos.forEach(filename => {
-        const img = document.createElement('img');
-        img.src = `images/${folder}/${filename}`;
-        img.className = "w-full aspect-square object-cover rounded cursor-pointer";
-        img.alt = filename;
-        img.onclick = () => openLightbox(`images/${folder}/${filename}`);
-        container.appendChild(img);
-      });
-    }
-
-    // Mobile Menu
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('active');
-      const icon = menuBtn.querySelector('i');
-      icon.classList.toggle('fa-bars');
-      icon.classList.toggle('fa-times');
-    });
-
-    // Lightbox
-    let isZoomed = false;
-
-    function openLightbox(src) {
-      const lightbox = document.getElementById('lightbox');
-      const img = document.getElementById('lightbox-image');
-      img.src = src;
-      img.classList.remove('zoomed');
-      isZoomed = false;
-      lightbox.style.display = 'flex';
-      
-      setTimeout(() => lightbox.classList.add('active'), 10);
-    }
-
-    function closeLightbox() {
-      const lightbox = document.getElementById('lightbox');
-      lightbox.classList.remove('active');
-      setTimeout(() => {
-        lightbox.style.display = 'none';
-      }, 400);
-    }
-
-    function toggleZoom() {
-      const img = document.getElementById('lightbox-image');
-      isZoomed = !isZoomed;
-      img.classList.toggle('zoomed', isZoomed);
-    }
-
-    // Close with Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === "Escape") closeLightbox();
-    });
-
-    // Initialize
-    createGallery('commercial-grid', commercialPhotos, "commercial");
-    createGallery('artistic-grid', artisticPhotos, "artistic");
-  </script>
+  <script src="images/hero/manifest.js" defer></script>
+  <script src="images/commercial/manifest.js" defer></script>
+  <script src="images/artistic/manifest.js" defer></script>
+  <script src="js/main.js" defer></script>
 </body>
 </html>
