@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taken as Read</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    h1, h2, nav a {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+    }
+
+    .hero { 
+      background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('images/background.JPG'); 
+      background-size: cover; 
+      background-position: center; 
+    }
+    .photo-grid img { transition: all 0.4s; }
+    .photo-grid img:hover { transform: scale(1.04); }
+
+    /* Mobile Menu */
+    .nav-links {
+      transition: all 0.4s ease;
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 76px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 76px);
+        background: #09090b;
+        flex-direction: column;
+        padding-top: 3rem;
+        gap: 2rem;
+      }
+      .nav-links.active { left: 0; }
+    }
+
+    /* Improved Lightbox */
+    #lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.98);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #lightbox.active {
+      opacity: 1;
+    }
+    #lightbox-image {
+      max-width: 92%;
+      max-height: 92vh;
+      border: 12px solid white;
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.6);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: zoom-in;
+    }
+    #lightbox-image.zoomed {
+      transform: scale(1.18);
+      cursor: zoom-out;
+    }
+    .close {
+      position: absolute;
+      top: 25px;
+      right: 30px;
+      font-size: 42px;
+      color: white;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s;
+    }
+    .close:hover {
+      transform: rotate(90deg);
+      color: #fcd34d;
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-white">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full bg-black/95 backdrop-blur-md z-50">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
+      <h1 class="text-2xl tracking-widest">TAKEN AS READ</h1>
+      
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex space-x-8 text-sm">
+        <a href="#commercial" class="hover:text-amber-400 transition">Commercial</a>
+        <a href="#artistic" class="hover:text-amber-400 transition">Artistic</a>
+        <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button id="menu-btn" class="md:hidden text-3xl focus:outline-none">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="nav-links hidden md:hidden flex flex-col items-center text-lg">
+      <a href="#commercial" class="hover:text-amber-400">Commercial</a>
+      <a href="#artistic" class="hover:text-amber-400">Artistic</a>
+      <a href="#contact" class="hover:text-amber-400">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero h-screen flex items-center justify-center text-center">
+    <div>
+      <h2 class="text-5xl md:text-7xl font-light mb-4">Taken as Read</h2>
+      <p class="text-xl text-zinc-300">Photography</p>
+    </div>
+  </section>
+
+  <!-- Commercial Work -->
+  <section id="commercial" class="max-w-6xl mx-auto px-6 py-20">
+    <h2 class="text-4xl font-light mb-12 text-center">Commercial Work</h2>
+    <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="commercial-grid"></div>
+  </section>
+
+  <!-- Artistic Work -->
+  <section id="artistic" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
+    <h2 class="text-4xl font-light mb-12 text-center">Artistic Work</h2>
+    <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="artistic-grid"></div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="max-w-6xl mx-auto px-6 py-20 text-center">
+    <h2 class="text-4xl font-light mb-8">Get in Touch</h2>
+    <p class="text-zinc-400 mb-8">Interested in working together?</p>
+    <a href="mailto:takenasread@photographer.net" class="inline-block bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-amber-400 transition">
+      Send me an email
+    </a>
+    <p class="mt-10 text-zinc-500">takenasread@photographer.net</p>
+  </section>
+
+  <footer class="text-center py-10 text-zinc-500 text-sm">
+    © Taken as Read Photography
+  </footer>
+
+  <!-- Lightbox -->
+  <div id="lightbox">
+    <span class="close" onclick="closeLightbox()">×</span>
+    <img id="lightbox-image" src="" alt="" onclick="toggleZoom()">
+  </div>
+
+  <script>
+    // Your photos
+    const commercialPhotos = [
+      "bdance5.jpg", "blackford.JPG", "Blackford_Pavilion_Pergola.JPG", "dance.JPG",
+      "Fire_Hydrant_Three.JPG", "St Roque.JPG", "wedding.JPG"
+    ];
+
+    const artisticPhotos = [
+      "flowers (1).JPG", "flowers (2).JPG", "modern1 (1).jpg", "modern1 (2).JPG",
+      "water (1).JPG", "water (2).JPG", "water (3).JPG", "water (4).JPG",
+      "water (5).JPG"
+    ];
+
+    function createGallery(sectionId, photos, folder) {
+      const container = document.getElementById(sectionId);
+      container.innerHTML = '';
+      photos.forEach(filename => {
+        const img = document.createElement('img');
+        img.src = `images/${folder}/${filename}`;
+        img.className = "w-full aspect-square object-cover rounded cursor-pointer";
+        img.alt = filename;
+        img.onclick = () => openLightbox(`images/${folder}/${filename}`);
+        container.appendChild(img);
+      });
+    }
+
+    // Mobile Menu
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+      const icon = menuBtn.querySelector('i');
+      icon.classList.toggle('fa-bars');
+      icon.classList.toggle('fa-times');
+    });
+
+    // Lightbox
+    let isZoomed = false;
+
+    function openLightbox(src) {
+      const lightbox = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-image');
+      img.src = src;
+      img.classList.remove('zoomed');
+      isZoomed = false;
+      lightbox.style.display = 'flex';
+      
+      setTimeout(() => lightbox.classList.add('active'), 10);
+    }
+
+    function closeLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      lightbox.classList.remove('active');
+      setTimeout(() => {
+        lightbox.style.display = 'none';
+      }, 400);
+    }
+
+    function toggleZoom() {
+      const img = document.getElementById('lightbox-image');
+      isZoomed = !isZoomed;
+      img.classList.toggle('zoomed', isZoomed);
+    }
+
+    // Close with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+
+    // Initialize
+    createGallery('commercial-grid', commercialPhotos, "commercial");
+    createGallery('artistic-grid', artisticPhotos, "artistic");
+  </script>
+</body>
+</html>
