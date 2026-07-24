@@ -4,8 +4,10 @@
   "private": true,
   "description": "Taken as Read Photography",
   "scripts": {
-    "dev": "tailwindcss -i ./css/input.css -o ./css/styles.css --watch",
-    "build": "tailwindcss -i ./css/input.css -o ./css/styles.css --minify"
+    "build:images": "node scripts/build-images.js",
+    "build:css": "tailwindcss -i ./css/input.css -o ./css/styles.css --minify",
+    "build": "npm run build:images && npm run build:css",
+    "dev": "npm run build:images && tailwindcss -i ./css/input.css -o ./css/styles.css --watch"
   },
   "repository": {
     "type": "git",
@@ -14,5 +16,8 @@
   "license": "ISC",
   "devDependencies": {
     "tailwindcss": "^3.4.19"
+  },
+  "dependencies": {
+    "sharp": "^0.35.3"
   }
 }

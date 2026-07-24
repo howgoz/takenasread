@@ -145,12 +145,21 @@
   #menu-btn.active .line-3 { transform: translateY(-6px) rotate(-45deg); }
 
   /* Hero */
-  .hero-media {
-    animation: hero-zoom 20s ease-out forwards;
+  .hero-bg {
+    animation: hero-breathe 16s ease-in-out infinite alternate;
   }
-  @keyframes hero-zoom {
-    from { transform: scale(1.12); }
-    to { transform: scale(1); }
+  @keyframes hero-breathe {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+
+  .hero-layer {
+    @apply absolute inset-0 w-full h-full object-cover;
+    opacity: 0;
+    transition: opacity 2.2s ease;
+  }
+  .hero-layer.active {
+    opacity: 1;
   }
 
   .scroll-cue {
@@ -201,12 +210,18 @@
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal-stagger > *,
-  .hero-media,
   .scroll-cue,
   .gallery-frame img {
     transition: none !important;
     animation: none !important;
     transform: none !important;
     opacity: 1 !important;
+  }
+  .hero-bg {
+    animation: none !important;
+    transform: none !important;
+  }
+  .hero-layer {
+    transition: none !important;
   }
 }

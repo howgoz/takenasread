@@ -17,7 +17,6 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="preload" href="fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="images/hero.jpg" as="image">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-ink text-paper">
@@ -49,7 +48,10 @@
 
   <!-- Hero -->
   <section id="top" class="relative h-screen flex items-center justify-center text-center overflow-hidden">
-    <img src="images/hero.jpg" alt="" class="hero-media absolute inset-0 w-full h-full object-cover" fetchpriority="high">
+    <div class="hero-bg absolute inset-0">
+      <img id="hero-layer-a" class="hero-layer" alt="" fetchpriority="high">
+      <img id="hero-layer-b" class="hero-layer" alt="">
+    </div>
     <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/80"></div>
     <div class="relative z-10 px-6">
       <h2 class="text-6xl md:text-8xl font-light mb-5 tracking-wide">Taken as Read</h2>
@@ -123,6 +125,9 @@
     <div id="lightbox-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-sm text-zinc-400 tracking-widest"></div>
   </div>
 
+  <script src="images/hero/manifest.js" defer></script>
+  <script src="images/commercial/manifest.js" defer></script>
+  <script src="images/artistic/manifest.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 </html>

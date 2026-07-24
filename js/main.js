@@ -1,25 +1,7 @@
 (() => {
-  const commercialPhotos = [
-    "blackford-pavilion-pergola.jpg",
-    "st-roque.jpg",
-    "blackford.jpg",
-    "bdance-5.jpg",
-    "dance.jpg",
-    "fire-hydrant-three.jpg",
-    "wedding.jpg",
-  ];
-
-  const artisticPhotos = [
-    "flowers-1.jpg",
-    "flowers-2.jpg",
-    "modern-1.jpg",
-    "modern-2.jpg",
-    "water-1.jpg",
-    "water-2.jpg",
-    "water-3.jpg",
-    "water-4.jpg",
-    "water-5.jpg",
-  ];
+  const commercialPhotos = window.COMMERCIAL_IMAGES || [];
+  const artisticPhotos = window.ARTISTIC_IMAGES || [];
+  const heroPhotos = window.HERO_IMAGES || [];
 
   const expandIcon = `
     <span class="expand-icon">
@@ -74,6 +56,44 @@
     });
 
     return entries;
+  }
+
+  // Hero background slideshow
+  function initHeroSlideshow(filenames) {
+    const layerA = document.getElementById("hero-layer-a");
+    const layerB = document.getElementById("hero-layer-b");
+    if (!layerA || !layerB || !filenames.length) return;
+
+    const urls = filenames.map((f) => `images/hero/${f}`);
+    const layers = [layerA, layerB];
+    let activeLayer = 0;
+    let nextIndex = 1 % urls.length;
+
+    layers[0].src = urls[0];
+    layers[0].classList.add("active");
+
+    if (urls.length < 2) return;
+
+    function preload(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = resolve;
+        img.src = url;
+      });
+    }
+
+    preload(urls[nextIndex]);
+
+    setInterval(async () => {
+      const inactive = layers[1 - activeLayer];
+      await preload(urls[nextIndex]);
+      inactive.src = urls[nextIndex];
+      inactive.classList.add("active");
+      layers[activeLayer].classList.remove("active");
+      activeLayer = 1 - activeLayer;
+      nextIndex = (nextIndex + 1) % urls.length;
+    }, 7000);
   }
 
   // Mobile nav
@@ -198,6 +218,7 @@
     if (e.key === "ArrowLeft") step(-1);
   });
 
+  initHeroSlideshow(heroPhotos);
   buildGallery("commercial-grid", commercialPhotos, "commercial");
   buildGallery("artistic-grid", artisticPhotos, "artistic");
 })();
