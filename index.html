@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" href="/favicon.png" type="image/png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Taken as Read</title>
+
+  <!-- Use a relative favicon path so file:// opens it correctly -->
+  <link rel="icon" href="favicon.png" type="image/png">
+
+  <!-- Tailwind CDN (requires network). For offline testing, download and serve locally. -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
-    
+
     body {
       font-family: 'Inter', system-ui, sans-serif;
     }
@@ -19,18 +23,18 @@
       letter-spacing: 0.05em;
     }
 
-    .hero { 
-      background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('images/background.JPG'); 
-      background-size: cover; 
+    .hero {
+      background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('images/background.JPG');
+      background-size: cover;
       background-position: center;
       transition: background-image 1.5s ease-in-out;
     }
 
-    .photo-grid img { 
-      transition: all 0.4s ease; 
+    .photo-grid img {
+      transition: all 0.4s ease;
     }
-    .photo-grid img:hover { 
-      transform: scale(1.04); 
+    .photo-grid img:hover {
+      transform: scale(1.04);
     }
   </style>
 </head>
@@ -40,7 +44,7 @@
   <nav class="fixed top-0 w-full bg-black/95 backdrop-blur-md z-50">
     <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
       <h1 class="text-2xl tracking-widest">TAKEN AS READ</h1>
-      
+
       <!-- Desktop Menu -->
       <div class="hidden md:flex space-x-8 text-sm">
         <a href="about.html" class="hover:text-amber-400 transition">About</a>
@@ -50,8 +54,8 @@
       </div>
 
       <!-- Mobile Hamburger -->
-      <button id="menu-btn" class="md:hidden text-3xl focus:outline-none">
-        <i class="fas fa-bars"></i>
+      <button id="menu-btn" class="md:hidden text-3xl focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">
+        <i class="fas fa-bars" aria-hidden="true"></i>
       </button>
     </div>
 
@@ -88,7 +92,7 @@
   <section id="contact" class="max-w-6xl mx-auto px-6 py-20 text-center">
     <h2 class="text-4xl font-light mb-8">Get in Touch</h2>
     <p class="text-zinc-400 mb-8">Interested in working together?</p>
-    <a href="mailto:takenasread@photographer.net" 
+    <a href="mailto:takenasread@photographer.net"
        class="inline-block bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-amber-400 transition">
       Send me an email
     </a>
@@ -100,103 +104,119 @@
   </footer>
 
   <!-- Lightbox -->
-  <div id="lightbox" class="hidden fixed inset-0 bg-black/98 z-[1000] items-center justify-center">
-    <span class="close absolute top-8 right-8 text-6xl text-white cursor-pointer hover:text-amber-400" onclick="closeLightbox()">×</span>
-    <img id="lightbox-image" src="" alt="" class="max-w-[92%] max-h-[92vh] border-8 border-white shadow-2xl cursor-zoom-in" onclick="toggleZoom()">
+  <div id="lightbox" class="hidden fixed inset-0 bg-black/98 z-[1000] items-center justify-center" role="dialog" aria-hidden="true">
+    <button id="lightbox-close" class="absolute top-8 right-8 text-6xl text-white cursor-pointer hover:text-amber-400" aria-label="Close">×</button>
+    <img id="lightbox-image" src="" alt="" class="max-w-[92%] max-h-[92vh] border-8 border-white shadow-2xl cursor-zoom-in">
   </div>
 
   <script>
-    // Hero Background Rotator
-    const hero = document.querySelector('.hero');
-    const bgImages = [
-      'images/background.JPG',
-      'images/background2.JPG',
-      'images/background3.JPG',
-      'images/background4.JPG',
-      'images/background5.JPG',
-      'images/background6.JPG',
-      'images/background7.JPG',
-      'images/background8.JPG',
-      'images/background9.JPG',
-      'images/background10.JPG'
-    ];
-    let currentBg = 0;
+    // Wrap initialization to avoid errors when opening in odd environments
+    document.addEventListener('DOMContentLoaded', () => {
+      // Hero Background Rotator (guard hero element)
+      const hero = document.querySelector('.hero');
+      const bgImages = [
+        'images/background.JPG',
+        'images/background2.JPG',
+        'images/background3.JPG',
+        'images/background4.JPG',
+        'images/background5.JPG',
+        'images/background6.JPG',
+        'images/background7.JPG',
+        'images/background8.JPG',
+        'images/background9.JPG',
+        'images/background10.JPG'
+      ];
+      let currentBg = 0;
 
-    function changeHeroBackground() {
-      hero.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('${bgImages[currentBg]}')`;
-      currentBg = (currentBg + 1) % bgImages.length;
-    }
-    changeHeroBackground();
-    setInterval(changeHeroBackground, 5000);
+      function changeHeroBackground() {
+        if (!hero) return;
+        hero.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('${bgImages[currentBg]}')`;
+        currentBg = (currentBg + 1) % bgImages.length;
+      }
+      changeHeroBackground();
+      setInterval(changeHeroBackground, 5000);
 
-    // Galleries
-    const commercialPhotos = [
-      "bdance-5.jpg", "blackford.jpg", "blackford-pavilion-pergola.jpg", "dance.jpg",
-      "fire-hydrant-three.jpg", "st-roque.jpg", "wedding.jpg"
-    ];
+      // Galleries
+      const commercialPhotos = [
+        "bdance-5.jpg", "blackford.jpg", "blackford-pavilion-pergola.jpg", "dance.jpg",
+        "fire-hydrant-three.jpg", "st-roque.jpg", "wedding.jpg"
+      ];
 
-    const artisticPhotos = [
-      "flowers-1.jpg", "flowers-2.jpg", "modern-1.jpg", "modern-2.jpg",
-      "water-1.jpg", "water-2.jpg", "water-3.jpg", "water-4.jpg", "water-5.jpg","swoosh.jpg","kilgraston.jpg","reflections.jpg"
-    ];
+      const artisticPhotos = [
+        "flowers-1.jpg", "flowers-2.jpg", "modern-1.jpg", "modern-2.jpg",
+        "water-1.jpg", "water-2.jpg", "water-3.jpg", "water-4.jpg", "water-5.jpg","swoosh.jpg","kilgraston.jpg","reflections.jpg"
+      ];
 
-    function createGallery(containerId, photos, folder) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-      photos.forEach(filename => {
-        const img = document.createElement('img');
-        img.src = `images/${folder}/${filename}`;
-        img.className = "w-full aspect-square object-cover rounded cursor-pointer";
-        img.alt = filename;
-        img.onclick = () => openLightbox(`images/${folder}/${filename}`);
-        container.appendChild(img);
+      function createGallery(containerId, photos, folder) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        photos.forEach(filename => {
+          const img = document.createElement('img');
+          img.src = `images/${folder}/${filename}`;
+          img.className = "w-full aspect-square object-cover rounded cursor-pointer";
+          img.alt = filename;
+          img.addEventListener('click', () => openLightbox(`images/${folder}/${filename}`));
+          container.appendChild(img);
+        });
+      }
+
+      // Mobile Menu
+      const menuBtn = document.getElementById('menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', () => {
+          mobileMenu.classList.toggle('hidden');
+          const icon = menuBtn.querySelector('i');
+          if (icon) {
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+          }
+        });
+
+        mobileMenu.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            const icon = menuBtn.querySelector('i');
+            if (icon) {
+              icon.classList.remove('fa-times');
+              icon.classList.add('fa-bars');
+            }
+          });
+        });
+      }
+
+      // Lightbox handlers
+      const lightbox = document.getElementById('lightbox');
+      const lbImage = document.getElementById('lightbox-image');
+      const lbCloseBtn = document.getElementById('lightbox-close');
+
+      function openLightbox(src) {
+        if (!lightbox || !lbImage) return;
+        lbImage.src = src;
+        lightbox.classList.remove('hidden');
+        lightbox.classList.add('flex');
+        lightbox.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeLightbox() {
+        if (!lightbox) return;
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        lightbox.setAttribute('aria-hidden', 'true');
+        if (lbImage) lbImage.src = '';
+      }
+
+      if (lbCloseBtn) lbCloseBtn.addEventListener('click', closeLightbox);
+      // close on escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") closeLightbox();
       });
-    }
 
-    // Mobile Menu
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      const icon = menuBtn.querySelector('i');
-      icon.classList.toggle('fa-bars');
-      icon.classList.toggle('fa-times');
+      // Initialize galleries
+      createGallery('commercial-grid', commercialPhotos, "commercial");
+      createGallery('artistic-grid', artisticPhotos, "artistic");
     });
-
-    // Close mobile menu when clicking links
-    document.querySelectorAll('#mobile-menu a').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.add('hidden');
-      });
-    });
-
-    // Lightbox
-    function openLightbox(src) {
-      const lb = document.getElementById('lightbox');
-      document.getElementById('lightbox-image').src = src;
-      lb.classList.remove('hidden');
-      lb.classList.add('flex');
-    }
-
-    function closeLightbox() {
-      const lb = document.getElementById('lightbox');
-      lb.classList.add('hidden');
-      lb.classList.remove('flex');
-    }
-
-    function toggleZoom() {
-      const img = document.getElementById('lightbox-image');
-      img.classList.toggle('scale-110');
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === "Escape") closeLightbox();
-    });
-
-    // Initialize
-    createGallery('commercial-grid', commercialPhotos, "commercial");
-    createGallery('artistic-grid', artisticPhotos, "artistic");
   </script>
 </body>
 </html>
