@@ -1,47 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Taken as Read</title>
 
-  <!-- Use a relative favicon path so file:// opens it correctly -->
-  <link rel="icon" href="favicon.png" type="image/png">
+  <!-- Preconnect to speed up external requests -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
 
-  <!-- Tailwind CDN (requires network). For offline testing, download and serve locally. -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Use a relative favicon path so file:// opens it correctly -->
+  <link rel="icon" href="favicon.png" type="image/png" />
+
+  <!-- Tailwind CDN (dev only). For production: build Tailwind and include only used classes -->
+  <script src="https://cdn.tailwindcss.com" defer></script>
+
+  <!-- Google Fonts (non-blocking render; font-display=swap) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
-
+    /* Minimal critical CSS and fallbacks to reduce CLS if Tailwind is slow to load */
+    :root {
+      --bg: #0f1720; /* bg-zinc-950 fallback color */
+      --muted: #9ca3af; /* text-zinc-400 fallback */
+    }
+    html,body { height: 100%; }
     body {
+      margin: 0;
+      background: var(--bg);
+      color: white;
       font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
-    h1, h2, nav a {
-      font-weight: 300;
-      letter-spacing: 0.05em;
-    }
+    h1,h2,nav a { font-weight: 300; letter-spacing: .05em; }
 
+    /* Hero: use layered backgrounds and crossfade by transitioning opacity on layers */
     .hero {
-      background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('images/background.JPG');
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+    .hero-layer {
+      position: absolute;
+      inset: 0;
       background-size: cover;
       background-position: center;
-      transition: background-image 1.5s ease-in-out;
+      will-change: opacity, transform;
+      transition: opacity 1.2s ease-in-out, transform 0.6s ease;
+      opacity: 0;
+      transform: scale(1.02);
     }
+    .hero-layer.visible { opacity: 1; transform: scale(1); }
+    /* gradient overlay sits above layers and below content */
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75));
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 2; }
 
+    /* Ensure images reserve space to avoid layout shift even if Tailwind loads later */
     .photo-grid img {
-      transition: all 0.4s ease;
+      width: 100%;
+      aspect-ratio: 1 / 1; /* native CSS fallback */
+      object-fit: cover;
+      border-radius: .375rem; /* same as rounded in Tailwind */
+      transition: transform .4s ease;
+      display: block;
+      background: #0b0b0b;
     }
-    .photo-grid img:hover {
-      transform: scale(1.04);
-    }
+    .photo-grid img:hover { transform: scale(1.04); }
+
+    /* Lightbox */
+    #lightbox { display: none; }
+    #lightbox.flex { display: flex; }
+
+    /* Mobile menu basic fallback */
+    nav { position: fixed; top: 0; width: 100%; z-index: 50; }
   </style>
 </head>
 <body class="bg-zinc-950 text-white">
 
   <!-- Navigation -->
-  <nav class="fixed top-0 w-full bg-black/95 backdrop-blur-md z-50">
+  <nav class="bg-black/95 backdrop-blur-md">
     <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
       <h1 class="text-2xl tracking-widest">TAKEN AS READ</h1>
 
@@ -53,9 +101,11 @@
         <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
       </div>
 
-      <!-- Mobile Hamburger -->
+      <!-- Mobile Hamburger (inline SVG; removes Font Awesome dependency) -->
       <button id="menu-btn" class="md:hidden text-3xl focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">
-        <i class="fas fa-bars" aria-hidden="true"></i>
+        <svg id="menu-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
       </button>
     </div>
 
@@ -68,9 +118,12 @@
     </div>
   </nav>
 
-  <!-- Hero -->
-  <section class="hero h-screen flex items-center justify-center text-center">
-    <div>
+  <!-- Hero with layered background divs for smooth crossfade -->
+  <section class="hero" aria-label="Hero">
+    <div id="hero-layer-0" class="hero-layer" aria-hidden="true"></div>
+    <div id="hero-layer-1" class="hero-layer" aria-hidden="true"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="hero-content">
       <h2 class="text-5xl md:text-7xl font-light mb-4">Taken as Read</h2>
       <p class="text-xl text-zinc-300">Photography</p>
     </div>
@@ -92,8 +145,7 @@
   <section id="contact" class="max-w-6xl mx-auto px-6 py-20 text-center">
     <h2 class="text-4xl font-light mb-8">Get in Touch</h2>
     <p class="text-zinc-400 mb-8">Interested in working together?</p>
-    <a href="mailto:takenasread@photographer.net"
-       class="inline-block bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-amber-400 transition">
+    <a href="mailto:takenasread@photographer.net" class="inline-block bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-amber-400 transition">
       Send me an email
     </a>
     <p class="mt-10 text-zinc-500">takenasread@photographer.net</p>
@@ -105,15 +157,19 @@
 
   <!-- Lightbox -->
   <div id="lightbox" class="hidden fixed inset-0 bg-black/98 z-[1000] items-center justify-center" role="dialog" aria-hidden="true">
-    <button id="lightbox-close" class="absolute top-8 right-8 text-6xl text-white cursor-pointer hover:text-amber-400" aria-label="Close">×</button>
-    <img id="lightbox-image" src="" alt="" class="max-w-[92%] max-h-[92vh] border-8 border-white shadow-2xl cursor-zoom-in">
+    <button id="lightbox-close" class="absolute top-8 right-8 text-6xl text-white cursor-pointer hover:text-amber-400" aria-label="Close">
+      <!-- Inline close icon -->
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+    <img id="lightbox-image" src="" alt="" class="max-w-[92%] max-h-[92vh] border-8 border-white shadow-2xl cursor-zoom-in" />
   </div>
 
   <script>
-    // Wrap initialization to avoid errors when opening in odd environments
     document.addEventListener('DOMContentLoaded', () => {
-      // Hero Background Rotator (guard hero element)
-      const hero = document.querySelector('.hero');
+      // Hero background images (kept as list, but loaded lazily)
+      const heroLayers = [document.getElementById('hero-layer-0'), document.getElementById('hero-layer-1')];
       const bgImages = [
         'images/background.JPG',
         'images/background2.JPG',
@@ -126,22 +182,67 @@
         'images/background9.JPG',
         'images/background10.JPG'
       ];
-      let currentBg = 0;
+      let currentIndex = 0;
+      let visibleLayer = 0; // index of the layer that's currently visible (0 or 1)
+      let rotationInterval = 7000; // ms
 
-      function changeHeroBackground() {
-        if (!hero) return;
-        hero.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('${bgImages[currentBg]}')`;
-        currentBg = (currentBg + 1) % bgImages.length;
+      function preloadImage(src) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = () => resolve(src);
+          img.onerror = reject;
+        });
       }
-      changeHeroBackground();
-      setInterval(changeHeroBackground, 5000);
 
-      // Galleries
+      // Apply image to a layer (but don't show it until it's loaded)
+      function setLayerImage(layerIndex, src) {
+        const layer = heroLayers[layerIndex];
+        if (!layer) return Promise.reject('Layer not found');
+        return preloadImage(src).then(() => {
+          layer.style.backgroundImage = `url('${src}')`;
+        });
+      }
+
+      // Initialize: set first layer, make it visible, and start preloading others
+      (async () => {
+        try {
+          await setLayerImage(visibleLayer, bgImages[currentIndex]);
+          heroLayers[visibleLayer].classList.add('visible');
+          // preload the remaining images in background without blocking
+          for (let i = 1; i < bgImages.length; i++) {
+            const img = new Image(); img.src = bgImages[i];
+          }
+
+          // Rotate: load next image into hidden layer, then crossfade
+          setInterval(() => {
+            const nextIndex = (currentIndex + 1) % bgImages.length;
+            const hiddenLayer = 1 - visibleLayer;
+            // set image on hidden layer, then swap visibility
+            setLayerImage(hiddenLayer, bgImages[nextIndex]).then(() => {
+              // show hidden layer (fade in)
+              heroLayers[hiddenLayer].classList.add('visible');
+              // after transition, hide old layer
+              setTimeout(() => {
+                heroLayers[visibleLayer].classList.remove('visible');
+                visibleLayer = hiddenLayer;
+                currentIndex = nextIndex;
+              }, 1200); // match CSS transition duration
+            }).catch(() => {
+              // if loading fails, advance index anyway
+              currentIndex = nextIndex;
+            });
+          }, rotationInterval);
+        } catch (e) {
+          console.warn('Hero background setup failed', e);
+        }
+      })();
+
+      // Galleries (lazy loading images and using inline aspect-ratio fallback)
       const commercialPhotos = [
         "bdance-5.jpg", "blackford.jpg", "blackford-pavilion-pergola.jpg", "dance.jpg",
         "fire-hydrant-three.jpg", "st-roque.jpg", "wedding.jpg"
       ];
-
       const artisticPhotos = [
         "flowers-1.jpg", "flowers-2.jpg", "modern-1.jpg", "modern-2.jpg",
         "water-1.jpg", "water-2.jpg", "water-3.jpg", "water-4.jpg", "water-5.jpg","swoosh.jpg","kilgraston.jpg","reflections.jpg"
@@ -153,35 +254,44 @@
         container.innerHTML = '';
         photos.forEach(filename => {
           const img = document.createElement('img');
-          img.src = `images/${folder}/${filename}`;
+          img.src = `images/${folder}/${filename}`; // keep simple; later add srcset & WebP versions
+          img.setAttribute('alt', filename);
+          img.setAttribute('loading', 'lazy'); // lazy-load offscreen images
+          img.setAttribute('decoding', 'async'); // non-blocking decode
+          img.setAttribute('fetchpriority', 'low');
           img.className = "w-full aspect-square object-cover rounded cursor-pointer";
-          img.alt = filename;
+          // Inline style fallback to ensure aspect ratio before Tailwind loads
+          img.style.aspectRatio = '1 / 1';
           img.addEventListener('click', () => openLightbox(`images/${folder}/${filename}`));
           container.appendChild(img);
         });
       }
 
-      // Mobile Menu
+      // Mobile Menu toggle
       const menuBtn = document.getElementById('menu-btn');
       const mobileMenu = document.getElementById('mobile-menu');
+      const menuIcon = document.getElementById('menu-icon');
       if (menuBtn && mobileMenu) {
         menuBtn.addEventListener('click', () => {
-          mobileMenu.classList.toggle('hidden');
-          const icon = menuBtn.querySelector('i');
-          if (icon) {
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
+          const isHidden = mobileMenu.classList.toggle('hidden');
+          const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
+          menuBtn.setAttribute('aria-expanded', String(!expanded));
+          // swap icon between hamburger and X using inline SVG path replacement
+          if (!isHidden) {
+            // show menu: change to X
+            menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>';
+          } else {
+            // hamburger
+            menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>';
           }
         });
 
         mobileMenu.querySelectorAll('a').forEach(link => {
           link.addEventListener('click', () => {
             mobileMenu.classList.add('hidden');
-            const icon = menuBtn.querySelector('i');
-            if (icon) {
-              icon.classList.remove('fa-times');
-              icon.classList.add('fa-bars');
-            }
+            menuBtn.setAttribute('aria-expanded', 'false');
+            // restore hamburger icon
+            menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>';
           });
         });
       }
@@ -208,7 +318,6 @@
       }
 
       if (lbCloseBtn) lbCloseBtn.addEventListener('click', closeLightbox);
-      // close on escape
       document.addEventListener('keydown', (e) => {
         if (e.key === "Escape") closeLightbox();
       });
@@ -218,5 +327,15 @@
       createGallery('artistic-grid', artisticPhotos, "artistic");
     });
   </script>
+
+  <!--
+    Further recommendations (production):
+    - Build Tailwind locally and purge unused classes; include a single small CSS file instead of the CDN script.
+    - Convert and serve images in WebP/AVIF and provide responsive srcset for different viewport sizes.
+    - Set proper Cache-Control headers on images and assets (far-future caching + immutable when filenames are hashed).
+    - Use a CDN for static images.
+    - Consider lazy-loading offscreen background images and avoid rotating very large hero images on the initial load.
+    - Add width/height or real intrinsic sizes for important images if you have them, to further reduce CLS.
+  -->
 </body>
 </html>
