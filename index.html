@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" href="/favicon.png" type="image/png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Taken as Read</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
     
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
     }
     h1, h2, nav a {
-      font-family: 'Inter', system-ui, sans-serif;
       font-weight: 300;
       letter-spacing: 0.05em;
     }
@@ -21,71 +22,15 @@
     .hero { 
       background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('images/background.JPG'); 
       background-size: cover; 
-      background-position: center; 
-    }
-    .photo-grid img { transition: all 0.4s; }
-    .photo-grid img:hover { transform: scale(1.04); }
-
-    /* Mobile Menu */
-    .nav-links {
-      transition: all 0.4s ease;
-    }
-    @media (max-width: 768px) {
-      .nav-links {
-        position: fixed;
-        top: 76px;
-        left: -100%;
-        width: 100%;
-        height: calc(100vh - 76px);
-        background: #09090b;
-        flex-direction: column;
-        padding-top: 3rem;
-        gap: 2rem;
-      }
-      .nav-links.active { left: 0; }
+      background-position: center;
+      transition: background-image 1.5s ease-in-out;
     }
 
-    /* Improved Lightbox */
-    #lightbox {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.98);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+    .photo-grid img { 
+      transition: all 0.4s ease; 
     }
-    #lightbox.active {
-      opacity: 1;
-    }
-    #lightbox-image {
-      max-width: 92%;
-      max-height: 92vh;
-      border: 12px solid white;
-      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.6);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: zoom-in;
-    }
-    #lightbox-image.zoomed {
-      transform: scale(1.18);
-      cursor: zoom-out;
-    }
-    .close {
-      position: absolute;
-      top: 25px;
-      right: 30px;
-      font-size: 42px;
-      color: white;
-      cursor: pointer;
-      z-index: 10;
-      transition: all 0.3s;
-    }
-    .close:hover {
-      transform: rotate(90deg);
-      color: #fcd34d;
+    .photo-grid img:hover { 
+      transform: scale(1.04); 
     }
   </style>
 </head>
@@ -98,6 +43,7 @@
       
       <!-- Desktop Menu -->
       <div class="hidden md:flex space-x-8 text-sm">
+        <a href="about.html" class="hover:text-amber-400 transition">About</a>
         <a href="#commercial" class="hover:text-amber-400 transition">Commercial</a>
         <a href="#artistic" class="hover:text-amber-400 transition">Artistic</a>
         <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
@@ -110,10 +56,11 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="nav-links hidden md:hidden flex flex-col items-center text-lg">
-      <a href="#commercial" class="hover:text-amber-400">Commercial</a>
-      <a href="#artistic" class="hover:text-amber-400">Artistic</a>
-      <a href="#contact" class="hover:text-amber-400">Contact</a>
+    <div id="mobile-menu" class="hidden md:hidden flex flex-col items-center text-lg bg-zinc-950 py-8 border-t border-zinc-800">
+      <a href="about.html" class="hover:text-amber-400 py-3">About</a>
+      <a href="#commercial" class="hover:text-amber-400 py-3">Commercial</a>
+      <a href="#artistic" class="hover:text-amber-400 py-3">Artistic</a>
+      <a href="#contact" class="hover:text-amber-400 py-3">Contact</a>
     </div>
   </nav>
 
@@ -141,7 +88,8 @@
   <section id="contact" class="max-w-6xl mx-auto px-6 py-20 text-center">
     <h2 class="text-4xl font-light mb-8">Get in Touch</h2>
     <p class="text-zinc-400 mb-8">Interested in working together?</p>
-    <a href="mailto:takenasread@photographer.net" class="inline-block bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-amber-400 transition">
+    <a href="mailto:takenasread@photographer.net" 
+       class="inline-block bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-amber-400 transition">
       Send me an email
     </a>
     <p class="mt-10 text-zinc-500">takenasread@photographer.net</p>
@@ -152,26 +100,48 @@
   </footer>
 
   <!-- Lightbox -->
-  <div id="lightbox">
-    <span class="close" onclick="closeLightbox()">×</span>
-    <img id="lightbox-image" src="" alt="" onclick="toggleZoom()">
+  <div id="lightbox" class="hidden fixed inset-0 bg-black/98 z-[1000] items-center justify-center">
+    <span class="close absolute top-8 right-8 text-6xl text-white cursor-pointer hover:text-amber-400" onclick="closeLightbox()">×</span>
+    <img id="lightbox-image" src="" alt="" class="max-w-[92%] max-h-[92vh] border-8 border-white shadow-2xl cursor-zoom-in" onclick="toggleZoom()">
   </div>
 
   <script>
-    // Your photos
+    // Hero Background Rotator
+    const hero = document.querySelector('.hero');
+    const bgImages = [
+      'images/background.JPG',
+      'images/background2.JPG',
+      'images/background3.JPG',
+      'images/background4.JPG',
+      'images/background5.JPG',
+      'images/background6.JPG',
+      'images/background7.JPG',
+      'images/background8.JPG',
+      'images/background9.JPG',
+      'images/background10.JPG'
+    ];
+    let currentBg = 0;
+
+    function changeHeroBackground() {
+      hero.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('${bgImages[currentBg]}')`;
+      currentBg = (currentBg + 1) % bgImages.length;
+    }
+    changeHeroBackground();
+    setInterval(changeHeroBackground, 5000);
+
+    // Galleries
     const commercialPhotos = [
-      "bdance5.jpg", "blackford.JPG", "Blackford_Pavilion_Pergola.JPG", "dance.JPG",
-      "Fire_Hydrant_Three.JPG", "St Roque.JPG", "wedding.JPG"
+      "bdance-5.jpg", "blackford.jpg", "blackford-pavilion-pergola.jpg", "dance.jpg",
+      "fire-hydrant-three.jpg", "st-roque.jpg", "wedding.jpg"
     ];
 
     const artisticPhotos = [
-      "flowers (1).JPG", "flowers (2).JPG", "modern1 (1).jpg", "modern1 (2).JPG",
-      "water (1).JPG", "water (2).JPG", "water (3).JPG", "water (4).JPG",
-      "water (5).JPG"
+      "flowers-1.jpg", "flowers-2.jpg", "modern-1.jpg", "modern-2.jpg",
+      "water-1.jpg", "water-2.jpg", "water-3.jpg", "water-4.jpg", "water-5.jpg","swoosh.jpg","kilgraston.jpg","reflections.jpg"
     ];
 
-    function createGallery(sectionId, photos, folder) {
-      const container = document.getElementById(sectionId);
+    function createGallery(containerId, photos, folder) {
+      const container = document.getElementById(containerId);
       container.innerHTML = '';
       photos.forEach(filename => {
         const img = document.createElement('img');
@@ -186,43 +156,40 @@
     // Mobile Menu
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    
+
     menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('active');
+      mobileMenu.classList.toggle('hidden');
       const icon = menuBtn.querySelector('i');
       icon.classList.toggle('fa-bars');
       icon.classList.toggle('fa-times');
     });
 
-    // Lightbox
-    let isZoomed = false;
+    // Close mobile menu when clicking links
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+      });
+    });
 
+    // Lightbox
     function openLightbox(src) {
-      const lightbox = document.getElementById('lightbox');
-      const img = document.getElementById('lightbox-image');
-      img.src = src;
-      img.classList.remove('zoomed');
-      isZoomed = false;
-      lightbox.style.display = 'flex';
-      
-      setTimeout(() => lightbox.classList.add('active'), 10);
+      const lb = document.getElementById('lightbox');
+      document.getElementById('lightbox-image').src = src;
+      lb.classList.remove('hidden');
+      lb.classList.add('flex');
     }
 
     function closeLightbox() {
-      const lightbox = document.getElementById('lightbox');
-      lightbox.classList.remove('active');
-      setTimeout(() => {
-        lightbox.style.display = 'none';
-      }, 400);
+      const lb = document.getElementById('lightbox');
+      lb.classList.add('hidden');
+      lb.classList.remove('flex');
     }
 
     function toggleZoom() {
       const img = document.getElementById('lightbox-image');
-      isZoomed = !isZoomed;
-      img.classList.toggle('zoomed', isZoomed);
+      img.classList.toggle('scale-110');
     }
 
-    // Close with Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === "Escape") closeLightbox();
     });
