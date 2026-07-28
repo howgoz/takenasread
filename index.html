@@ -85,6 +85,18 @@
     #lightbox { display: none; }
     #lightbox.flex { display: flex; }
 
+    /* Lightbox zoom behavior */
+    #lightbox-image {
+      transition: transform .3s ease;
+      will-change: transform;
+      touch-action: none; /* helps on mobile */
+      cursor: zoom-in;
+    }
+    #lightbox-image.zoomed {
+      transform: scale(2); /* adjust scale as needed */
+      cursor: zoom-out;
+    }
+
     /* Mobile menu basic fallback */
     nav { position: fixed; top: 0; width: 100%; z-index: 50; }
   </style>
@@ -307,6 +319,8 @@
       function openLightbox(src) {
         if (!lightbox || !lbImage) return;
         lbImage.src = src;
+        // Ensure any previous zoom state is cleared when opening a new image
+        lbImage.classList.remove('zoomed');
         lightbox.classList.remove('hidden');
         lightbox.classList.add('flex');
         lightbox.setAttribute('aria-hidden', 'false');
@@ -317,13 +331,28 @@
         lightbox.classList.add('hidden');
         lightbox.classList.remove('flex');
         lightbox.setAttribute('aria-hidden', 'true');
-        if (lbImage) lbImage.src = '';
+        if (lbImage) {
+          lbImage.src = '';
+          // remove zoom class and reset transform/cursor state
+          lbImage.classList.remove('zoomed');
+          lbImage.style.transform = '';
+          lbImage.style.cursor = '';
+        }
       }
 
       if (lbCloseBtn) lbCloseBtn.addEventListener('click', closeLightbox);
       document.addEventListener('keydown', (e) => {
         if (e.key === "Escape") closeLightbox();
       });
+
+      // Toggle zoom on image click
+      if (lbImage) {
+        lbImage.addEventListener('click', () => {
+          // Toggle zoom only if an image is loaded
+          if (!lbImage.src) return;
+          lbImage.classList.toggle('zoomed');
+        });
+      }
 
       // Initialize galleries
       createGallery('commercial-grid', commercialPhotos, "commercial");
