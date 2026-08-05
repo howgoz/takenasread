@@ -119,6 +119,7 @@
         <a href="about.html" class="hover:text-amber-400 transition">About</a>
         <a href="#commercial" class="hover:text-amber-400 transition">Commercial</a>
         <a href="#artistic" class="hover:text-amber-400 transition">Artistic</a>
+        <a href="#locations" class="hover:text-amber-400 transition">Locations</a>
         <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
       </div>
 
@@ -135,6 +136,7 @@
       <a href="about.html" class="hover:text-amber-400 py-3">About</a>
       <a href="#commercial" class="hover:text-amber-400 py-3">Commercial</a>
       <a href="#artistic" class="hover:text-amber-400 py-3">Artistic</a>
+      <a href="#locations" class="hover:text-amber-400 py-3">Locations</a>
       <a href="#contact" class="hover:text-amber-400 py-3">Contact</a>
     </div>
   </nav>
@@ -160,6 +162,12 @@
   <section id="artistic" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
     <h2 class="text-4xl font-light mb-12 text-center">Artistic Work</h2>
     <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="artistic-grid"></div>
+  </section>
+
+  <!-- Locations Work -->
+  <section id="locations" class="max-w-6xl mx-auto px-6 py-20">
+    <h2 class="text-4xl font-light mb-12 text-center">Locations</h2>
+    <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="locations-grid"></div>
   </section>
 
   <!-- Contact -->
@@ -317,6 +325,42 @@
         });
       }
 
+      // Pattern-based gallery loader: attempts to load images named like prefix01.jpg, prefix02.jpg ...
+      function createPatternGallery(containerId, folder, prefix, maxCount) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        let loadedAny = false;
+        const promises = [];
+        for (let i = 1; i <= maxCount; i++) {
+          const num = String(i).padStart(2, '0');
+          const filename = `${prefix}${num}.jpg`;
+          const src = `images/${folder}/${filename}`;
+          const p = preloadImage(src).then(() => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = filename;
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.fetchpriority = 'low';
+            img.className = "w-full aspect-square object-cover rounded cursor-pointer";
+            img.style.aspectRatio = '1 / 1';
+            img.addEventListener('click', () => openLightbox(src));
+            container.appendChild(img);
+            loadedAny = true;
+          }).catch(() => {
+            // ignore missing images silently
+          });
+          promises.push(p);
+        }
+        // If none found after attempts, show a small muted message
+        Promise.all(promises).then(() => {
+          if (!loadedAny) {
+            container.innerHTML = '<p class="muted text-center">No location images found in images/locations/</p>';
+          }
+        });
+      }
+
       // Mobile Menu toggle
       const menuBtn = document.getElementById('menu-btn');
       const mobileMenu = document.getElementById('mobile-menu');
@@ -392,6 +436,9 @@
       // Initialize galleries
       createGallery('commercial-grid', commercialPhotos, "commercial");
       createGallery('artistic-grid', artisticPhotos, "artistic");
+      // Attempt to load location images named location01.jpg, location02.jpg, ... from images/locations/
+      // the maxCount here is conservative; increase if you have more images.
+      createPatternGallery('locations-grid', 'locations', 'location', 35);
 
       // Contact form: AJAX submit to FormSubmit.co and simple UX feedback
       const contactForm = document.getElementById('contact-form');
