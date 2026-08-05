@@ -3,43 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Taken as Read — photography portfolio: commercial, artistic, and location work." />
   <title>Taken as Read</title>
 
-  <!-- Preconnect to speed up external requests -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
 
-  <!-- Favicons: icon.png shown in browser tab; include multiple links for compatibility -->
   <link rel="icon" href="icon.png" type="image/png" sizes="32x32" />
   <link rel="icon" href="icon.png" type="image/png" sizes="16x16" />
   <link rel="apple-touch-icon" href="icon.png" />
-  <link rel="shortcut icon" href="icon.png" type="image/png" />
 
-  <!-- Tailwind CDN (dev only). For production: build Tailwind and include only used classes -->
+  <!-- Dev only. For production: build & purge Tailwind -->
   <script src="https://cdn.tailwindcss.com" defer></script>
 
-  <!-- Google Fonts (non-blocking render; font-display=swap) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
-    /* Minimal critical CSS and fallbacks to reduce CLS if Tailwind is slow to load */
     :root {
-      --bg: #0f1720; /* bg-zinc-950 fallback color */
-      --muted: #9ca3af; /* text-zinc-400 fallback */
+      --bg: #0f1720;
+      --muted: #9ca3af;
+      --overlay: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75));
+      --hero-transition: 1.2s ease-in-out;
     }
-    html,body { height: 100%; }
+
+    html { scroll-behavior: smooth; }
+    html, body { height: 100%; }
     body {
       margin: 0;
       background: var(--bg);
-      color: white;
+      color: #fff;
       font-family: 'Inter', system-ui, sans-serif;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
-    h1,h2,nav a { font-weight: 300; letter-spacing: .05em; }
+    h1, h2, nav a { font-weight: 300; letter-spacing: 0.05em; }
 
-    /* Hero: use layered backgrounds and crossfade by transitioning opacity on layers */
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 10000;
+      padding: 0.75rem 1rem;
+      background: #fff;
+      color: #000;
+    }
+    .skip-link:focus { left: 1rem; top: 1rem; }
+
+    /* Hero */
     .hero {
       position: relative;
       min-height: 100vh;
@@ -54,67 +66,103 @@
       inset: 0;
       background-size: cover;
       background-position: center;
-      will-change: opacity, transform;
-      transition: opacity 1.2s ease-in-out, transform 0.6s ease;
       opacity: 0;
       transform: scale(1.02);
+      transition: opacity var(--hero-transition), transform 0.6s ease;
+      will-change: opacity, transform;
     }
-    .hero-layer.visible { opacity: 1; transform: scale(1); }
-    /* gradient overlay sits above layers and below content */
+    .hero-layer.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
     .hero-overlay {
       position: absolute;
       inset: 0;
-      background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75));
+      background-image: var(--overlay);
       pointer-events: none;
     }
     .hero-content { position: relative; z-index: 2; }
 
-    /* Ensure images reserve space to avoid layout shift even if Tailwind loads later */
+    /* Photo grid */
     .photo-grid img {
       width: 100%;
-      aspect-ratio: 1 / 1; /* native CSS fallback */
+      aspect-ratio: 1 / 1;
       object-fit: cover;
-      border-radius: .375rem; /* same as rounded in Tailwind */
-      transition: transform .4s ease;
+      border-radius: 0.375rem;
       display: block;
       background: #0b0b0b;
+      transition: transform 0.4s ease;
+      cursor: pointer;
     }
-    .photo-grid img:hover { transform: scale(1.04); }
+    .photo-grid img:hover,
+    .photo-grid img:focus-visible {
+      transform: scale(1.04);
+      outline: 2px solid #fbbf24;
+      outline-offset: 2px;
+    }
 
     /* Lightbox */
     #lightbox { display: none; }
-    #lightbox.flex { display: flex; }
-
-    /* Lightbox zoom behavior */
+    #lightbox.is-open { display: flex; }
     #lightbox-image {
-      transition: transform .3s ease;
+      transition: transform 0.3s ease;
       will-change: transform;
-      touch-action: none; /* helps on mobile */
+      touch-action: none;
       cursor: zoom-in;
+      max-width: 92%;
+      max-height: 92vh;
     }
     #lightbox-image.zoomed {
-      transform: scale(2); /* adjust scale as needed */
+      transform: scale(2);
       cursor: zoom-out;
     }
 
-    /* Mobile menu basic fallback */
     nav { position: fixed; top: 0; width: 100%; z-index: 50; }
 
-    /* Contact form small styles for fallback before Tailwind */
-    .contact-card { background: #0b0b0b; border: 1px solid #1f2937; padding: 1.25rem; border-radius: 0.5rem; }
-    .input, textarea { width: 100%; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #374151; background: #0b0b0b; color: white; }
-    .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 9999px; background:white; color:black; font-weight:500; }
-    .muted { color: #9ca3af; }
+    /* Fallbacks before Tailwind */
+    .contact-card {
+      background: #0b0b0b;
+      border: 1px solid #1f2937;
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+    }
+    .input, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid #374151;
+      background: #0b0b0b;
+      color: #fff;
+    }
+    .input:focus, textarea:focus {
+      outline: 2px solid #fbbf24;
+      outline-offset: 1px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      background: #fff;
+      color: #000;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .muted { color: var(--muted); }
   </style>
 </head>
 <body class="bg-zinc-950 text-white">
 
-  <!-- Navigation -->
-  <nav class="bg-black/95 backdrop-blur-md">
-    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
-      <h1 class="text-2xl tracking-widest">TAKEN AS READ</h1>
+  <a href="#main" class="skip-link">Skip to content</a>
 
-      <!-- Desktop Menu -->
+  <!-- Navigation -->
+  <nav class="bg-black/95 backdrop-blur-md" aria-label="Main">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
+      <a href="#" class="text-2xl tracking-widest no-underline text-white hover:text-amber-400 transition">
+        TAKEN AS READ
+      </a>
+
       <div class="hidden md:flex space-x-8 text-sm">
         <a href="about.html" class="hover:text-amber-400 transition">About</a>
         <a href="#commercial" class="hover:text-amber-400 transition">Commercial</a>
@@ -123,16 +171,21 @@
         <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
       </div>
 
-      <!-- Mobile Hamburger (inline SVG; removes Font Awesome dependency) -->
-      <button id="menu-btn" class="md:hidden text-3xl focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">
+      <button
+        id="menu-btn"
+        class="md:hidden text-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Open menu"
+        type="button"
+      >
         <svg id="menu-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden flex flex-col items-center text-lg bg-zinc-950 py-8 border-t border-zinc-800">
+    <div id="mobile-menu" class="hidden md:hidden flex flex-col items-center text-lg bg-zinc-950 py-8 border-t border-zinc-800" hidden>
       <a href="about.html" class="hover:text-amber-400 py-3">About</a>
       <a href="#commercial" class="hover:text-amber-400 py-3">Commercial</a>
       <a href="#artistic" class="hover:text-amber-400 py-3">Artistic</a>
@@ -141,94 +194,113 @@
     </div>
   </nav>
 
-  <!-- Hero with layered background divs for smooth crossfade -->
-  <section class="hero" aria-label="Hero">
-    <div id="hero-layer-0" class="hero-layer" aria-hidden="true"></div>
-    <div id="hero-layer-1" class="hero-layer" aria-hidden="true"></div>
-    <div class="hero-overlay" aria-hidden="true"></div>
-    <div class="hero-content">
-      <h2 class="text-5xl md:text-7xl font-light mb-4">Taken as Read</h2>
-      <p class="text-xl text-zinc-300">Photography</p>
-    </div>
-  </section>
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero" aria-label="Hero">
+      <div id="hero-layer-0" class="hero-layer" aria-hidden="true"></div>
+      <div id="hero-layer-1" class="hero-layer" aria-hidden="true"></div>
+      <div class="hero-overlay" aria-hidden="true"></div>
+      <div class="hero-content">
+        <h1 class="text-5xl md:text-7xl font-light mb-4">Taken as Read</h1>
+        <p class="text-xl text-zinc-300">Photography</p>
+      </div>
+    </section>
 
-  <!-- Commercial Work -->
-  <section id="commercial" class="max-w-6xl mx-auto px-6 py-20">
-    <h2 class="text-4xl font-light mb-12 text-center">Commercial Work</h2>
-    <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="commercial-grid"></div>
-  </section>
+    <!-- Commercial -->
+    <section id="commercial" class="max-w-6xl mx-auto px-6 py-20">
+      <h2 class="text-4xl font-light mb-12 text-center">Commercial Work</h2>
+      <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="commercial-grid"></div>
+    </section>
 
-  <!-- Artistic Work -->
-  <section id="artistic" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
-    <h2 class="text-4xl font-light mb-12 text-center">Artistic Work</h2>
-    <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="artistic-grid"></div>
-  </section>
+    <!-- Artistic -->
+    <section id="artistic" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
+      <h2 class="text-4xl font-light mb-12 text-center">Artistic Work</h2>
+      <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="artistic-grid"></div>
+    </section>
 
-  <!-- Locations Work -->
-  <section id="locations" class="max-w-6xl mx-auto px-6 py-20">
-    <h2 class="text-4xl font-light mb-12 text-center">Locations</h2>
-    <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="locations-grid"></div>
-  </section>
+    <!-- Locations -->
+    <section id="locations" class="max-w-6xl mx-auto px-6 py-20">
+      <h2 class="text-4xl font-light mb-12 text-center">Locations</h2>
+      <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="locations-grid"></div>
+    </section>
 
-  <!-- Contact -->
-  <section id="contact" class="max-w-6xl mx-auto px-6 py-20 text-center">
-    <h2 class="text-4xl font-light mb-8">Get in Touch</h2>
-    <p class="text-zinc-400 mb-8">Interested in working together? Send a quick message and I'll get back to you.</p>
+    <!-- Contact -->
+    <section id="contact" class="max-w-6xl mx-auto px-6 py-20 text-center">
+      <h2 class="text-4xl font-light mb-8">Get in Touch</h2>
+      <p class="text-zinc-400 mb-8">Interested in working together? Send a quick message and I'll get back to you.</p>
 
-    <!-- Contact form: uses FormSubmit.co to forward emails to takenasread@photographer.net -->
-    <div class="max-w-2xl mx-auto contact-card">
-      <form id="contact-form" class="space-y-4" method="POST" action="https://formsubmit.co/ajax/takenasread@photographer.net">
-        <!-- Prevent spam: simple honeypot -->
-        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-        <input type="hidden" name="_subject" value="Website contact: Taken as Read">
-        <input type="hidden" name="_captcha" value="false">
+      <div class="max-w-2xl mx-auto contact-card">
+        <form
+          id="contact-form"
+          class="space-y-4"
+          method="POST"
+          action="https://formsubmit.co/ajax/takenasread@photographer.net"
+          novalidate
+        >
+          <input type="text" name="_honey" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <input type="hidden" name="_subject" value="Website contact: Taken as Read" />
+          <input type="hidden" name="_captcha" value="false" />
 
-        <div class="text-left">
-          <label for="name" class="block muted mb-1">Name (optional)</label>
-          <input id="name" name="name" class="input" type="text" placeholder="Your name">
-        </div>
+          <div class="text-left">
+            <label for="name" class="block muted mb-1">Name (optional)</label>
+            <input id="name" name="name" class="input" type="text" placeholder="Your name" autocomplete="name" />
+          </div>
 
-        <div class="text-left">
-          <label for="email" class="block muted mb-1">Email</label>
-          <input id="email" name="email" class="input" type="email" placeholder="you@example.com" required>
-        </div>
+          <div class="text-left">
+            <label for="email" class="block muted mb-1">Email</label>
+            <input id="email" name="email" class="input" type="email" placeholder="you@example.com" required autocomplete="email" />
+          </div>
 
-        <div class="text-left">
-          <label for="message" class="block muted mb-1">Message</label>
-          <textarea id="message" name="message" class="input" rows="6" placeholder="Say hello, tell me about your project..." required></textarea>
-        </div>
+          <div class="text-left">
+            <label for="message" class="block muted mb-1">Message</label>
+            <textarea id="message" name="message" class="input" rows="6" placeholder="Say hello, tell me about your project..." required></textarea>
+          </div>
 
-        <div class="flex items-center justify-center">
-          <button type="submit" id="contact-submit" class="btn">Send message</button>
-        </div>
+          <div class="flex items-center justify-center">
+            <button type="submit" id="contact-submit" class="btn">Send message</button>
+          </div>
 
-        <p id="contact-feedback" class="mt-2 muted" role="status" aria-live="polite"></p>
-      </form>
+          <p id="contact-feedback" class="mt-2 muted" role="status" aria-live="polite"></p>
+        </form>
 
-      <p class="mt-6 muted">Or email directly: <a href="mailto:takenasread@photographer.net" class="text-amber-400">takenasread@photographer.net</a></p>
-    </div>
-  </section>
+        <p class="mt-6 muted">
+          Or email directly:
+          <a href="mailto:takenasread@photographer.net" class="text-amber-400">takenasread@photographer.net</a>
+        </p>
+      </div>
+    </section>
+  </main>
 
   <footer class="text-center py-10 text-zinc-500 text-sm">
     © Taken as Read Photography
   </footer>
 
   <!-- Lightbox -->
-  <div id="lightbox" class="hidden fixed inset-0 bg-black/98 z-[1000] items-center justify-center" role="dialog" aria-hidden="true">
-    <button id="lightbox-close" class="absolute top-8 right-8 text-6xl text-white cursor-pointer hover:text-amber-400" aria-label="Close">
-      <!-- Inline close icon -->
+  <div
+    id="lightbox"
+    class="fixed inset-0 bg-black/98 z-[1000] items-center justify-center"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image preview"
+    aria-hidden="true"
+  >
+    <button
+      id="lightbox-close"
+      type="button"
+      class="absolute top-8 right-8 text-white cursor-pointer hover:text-amber-400 focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
+      aria-label="Close"
+    >
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
       </svg>
     </button>
-    <img id="lightbox-image" src="" alt="" class="max-w-[92%] max-h-[92vh] border-8 border-white shadow-2xl cursor-zoom-in" />
+    <img id="lightbox-image" src="" alt="" class="border-8 border-white shadow-2xl" />
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Hero background images (kept as list, but loaded lazily)
-      const heroLayers = [document.getElementById('hero-layer-0'), document.getElementById('hero-layer-1')];
-      const bgImages = [
+      // ---------- Config ----------
+      const HERO_IMAGES = [
         'images/background.JPG',
         'images/background2.JPG',
         'images/background3.JPG',
@@ -242,269 +314,310 @@
         'images/background11.JPG',
         'images/background12.JPG'
       ];
-      let currentIndex = 0;
-      let visibleLayer = 0; // index of the layer that's currently visible (0 or 1)
-      let rotationInterval = 7000; // ms
+      const HERO_INTERVAL_MS = 7000;
+      const HERO_FADE_MS = 1200;
 
+      const GALLERIES = {
+        commercial: {
+          containerId: 'commercial-grid',
+          folder: 'commercial',
+          photos: [
+            'bdance-5.jpg', 'blackford.jpg', 'blackford-pavilion-pergola.jpg', 'dance.jpg',
+            'fire-hydrant-three.jpg', 'st-roque.jpg', 'wedding.jpg'
+          ]
+        },
+        artistic: {
+          containerId: 'artistic-grid',
+          folder: 'artistic',
+          photos: [
+            'flowers-1.jpg', 'flowers-2.jpg', 'modern-1.jpg', 'modern-2.jpg',
+            'water-1.jpg', 'water-2.jpg', 'water-3.jpg', 'water-4.jpg', 'water-5.jpg',
+            'swoosh.jpg', 'kilgraston.jpg', 'reflections.jpg'
+          ]
+        }
+      };
+
+      // ---------- Utilities ----------
       function preloadImage(src) {
         return new Promise((resolve, reject) => {
           const img = new Image();
-          img.src = src;
           img.onload = () => resolve(src);
-          img.onerror = reject;
+          img.onerror = () => reject(new Error(`Failed to load ${src}`));
+          img.src = src;
         });
       }
 
-      // Apply image to a layer (but don't show it until it's loaded)
-      function setLayerImage(layerIndex, src) {
-        const layer = heroLayers[layerIndex];
-        if (!layer) return Promise.reject('Layer not found');
-        return preloadImage(src).then(() => {
-          layer.style.backgroundImage = `url('${src}')`;
-        });
+      function filenameToAlt(filename) {
+        return filename
+          .replace(/\.[^.]+$/, '')
+          .replace(/[-_]+/g, ' ')
+          .replace(/\b\w/g, c => c.toUpperCase());
       }
 
-      // Initialize: set first layer, make it visible, and start preloading others
-      (async () => {
-        try {
-          await setLayerImage(visibleLayer, bgImages[currentIndex]);
-          heroLayers[visibleLayer].classList.add('visible');
-          // preload the remaining images in background without blocking
-          for (let i = 1; i < bgImages.length; i++) {
-            const img = new Image(); img.src = bgImages[i];
-          }
+      // ---------- Hero ----------
+      (function initHero() {
+        const layers = [
+          document.getElementById('hero-layer-0'),
+          document.getElementById('hero-layer-1')
+        ];
+        if (!layers[0] || !layers[1] || !HERO_IMAGES.length) return;
 
-          // Rotate: load next image into hidden layer, then crossfade
-          setInterval(() => {
-            const nextIndex = (currentIndex + 1) % bgImages.length;
-            const hiddenLayer = 1 - visibleLayer;
-            // set image on hidden layer, then swap visibility
-            setLayerImage(hiddenLayer, bgImages[nextIndex]).then(() => {
-              // show hidden layer (fade in)
-              heroLayers[hiddenLayer].classList.add('visible');
-              // after transition, hide old layer
-              setTimeout(() => {
-                heroLayers[visibleLayer].classList.remove('visible');
-                visibleLayer = hiddenLayer;
-                currentIndex = nextIndex;
-              }, 1200); // match CSS transition duration
-            }).catch(() => {
-              // if loading fails, advance index anyway
-              currentIndex = nextIndex;
-            });
-          }, rotationInterval);
-        } catch (e) {
-          console.warn('Hero background setup failed', e);
+        let currentIndex = 0;
+        let visibleLayer = 0;
+        let rotating = false;
+
+        async function setLayerImage(layerIndex, src) {
+          await preloadImage(src);
+          layers[layerIndex].style.backgroundImage = `url("${src}")`;
         }
+
+        async function start() {
+          try {
+            await setLayerImage(visibleLayer, HERO_IMAGES[currentIndex]);
+            layers[visibleLayer].classList.add('visible');
+
+            // Warm remaining images (low priority)
+            HERO_IMAGES.slice(1).forEach(src => {
+              const img = new Image();
+              img.src = src;
+            });
+
+            setInterval(async () => {
+              if (rotating) return;
+              rotating = true;
+              const nextIndex = (currentIndex + 1) % HERO_IMAGES.length;
+              const hiddenLayer = 1 - visibleLayer;
+
+              try {
+                await setLayerImage(hiddenLayer, HERO_IMAGES[nextIndex]);
+                layers[hiddenLayer].classList.add('visible');
+                setTimeout(() => {
+                  layers[visibleLayer].classList.remove('visible');
+                  visibleLayer = hiddenLayer;
+                  currentIndex = nextIndex;
+                  rotating = false;
+                }, HERO_FADE_MS);
+              } catch {
+                currentIndex = nextIndex;
+                rotating = false;
+              }
+            }, HERO_INTERVAL_MS);
+          } catch (e) {
+            console.warn('Hero background setup failed', e);
+          }
+        }
+
+        start();
       })();
 
-      // Galleries (lazy loading images and using inline aspect-ratio fallback)
-      const commercialPhotos = [
-        "bdance-5.jpg", "blackford.jpg", "blackford-pavilion-pergola.jpg", "dance.jpg",
-        "fire-hydrant-three.jpg", "st-roque.jpg", "wedding.jpg"
-      ];
-      const artisticPhotos = [
-        "flowers-1.jpg", "flowers-2.jpg", "modern-1.jpg", "modern-2.jpg",
-        "water-1.jpg", "water-2.jpg", "water-3.jpg", "water-4.jpg", "water-5.jpg","swoosh.jpg","kilgraston.jpg","reflections.jpg"
-      ];
-
-      function createGallery(containerId, photos, folder) {
+      // ---------- Galleries ----------
+      function createGallery({ containerId, folder, photos }) {
         const container = document.getElementById(containerId);
         if (!container) return;
-        container.innerHTML = '';
+        container.replaceChildren();
+
+        const fragment = document.createDocumentFragment();
         photos.forEach(filename => {
+          const src = `images/${folder}/${filename}`;
           const img = document.createElement('img');
-          img.src = `images/${folder}/${filename}`; // keep simple; later add srcset & WebP versions
-          img.setAttribute('alt', filename);
-          img.setAttribute('loading', 'lazy'); // lazy-load offscreen images
-          img.setAttribute('decoding', 'async'); // non-blocking decode
-          img.setAttribute('fetchpriority', 'low');
-          img.className = "w-full aspect-square object-cover rounded cursor-pointer";
-          // Inline style fallback to ensure aspect ratio before Tailwind loads
-          img.style.aspectRatio = '1 / 1';
-          img.addEventListener('click', () => openLightbox(`images/${folder}/${filename}`));
-          container.appendChild(img);
+          img.src = src;
+          img.alt = filenameToAlt(filename);
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          img.className = 'w-full aspect-square object-cover rounded';
+          img.tabIndex = 0;
+          img.addEventListener('click', () => openLightbox(src, img.alt));
+          img.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openLightbox(src, img.alt);
+            }
+          });
+          fragment.appendChild(img);
         });
+        container.appendChild(fragment);
       }
 
-      // Pattern-based gallery loader: attempts to load images named like prefix01.jpg, prefix02.jpg ...
-      function createPatternGallery(containerId, folder, prefix, maxCount) {
+      async function createPatternGallery(containerId, folder, prefix, maxCount) {
         const container = document.getElementById(containerId);
         if (!container) return;
-        container.innerHTML = '';
-        let loadedAny = false;
-        const promises = [];
-        for (let i = 1; i <= maxCount; i++) {
-          const num = String(i).padStart(2, '0');
+        container.replaceChildren();
+
+        const fragment = document.createDocumentFragment();
+        let loaded = 0;
+
+        const checks = Array.from({ length: maxCount }, (_, i) => {
+          const num = String(i + 1).padStart(2, '0');
           const filename = `${prefix}${num}.jpg`;
           const src = `images/${folder}/${filename}`;
-          const p = preloadImage(src).then(() => {
-            const img = document.createElement('img');
-            img.src = src;
-            img.alt = filename;
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            img.fetchpriority = 'low';
-            img.className = "w-full aspect-square object-cover rounded cursor-pointer";
-            img.style.aspectRatio = '1 / 1';
-            img.addEventListener('click', () => openLightbox(src));
-            container.appendChild(img);
-            loadedAny = true;
-          }).catch(() => {
-            // ignore missing images silently
-          });
-          promises.push(p);
-        }
-        // If none found after attempts, show a small muted message
-        Promise.all(promises).then(() => {
-          if (!loadedAny) {
-            container.innerHTML = '<p class="muted text-center">No location images found in images/locations/</p>';
-          }
+          return preloadImage(src)
+            .then(() => {
+              const img = document.createElement('img');
+              img.src = src;
+              img.alt = filenameToAlt(filename);
+              img.loading = 'lazy';
+              img.decoding = 'async';
+              img.className = 'w-full aspect-square object-cover rounded';
+              img.tabIndex = 0;
+              img.addEventListener('click', () => openLightbox(src, img.alt));
+              img.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  openLightbox(src, img.alt);
+                }
+              });
+              fragment.appendChild(img);
+              loaded++;
+            })
+            .catch(() => {});
         });
+
+        await Promise.all(checks);
+        if (loaded) {
+          container.appendChild(fragment);
+        } else {
+          container.innerHTML = '<p class="muted text-center">No location images found.</p>';
+        }
       }
 
-      // Mobile Menu toggle
-      const menuBtn = document.getElementById('menu-btn');
-      const mobileMenu = document.getElementById('mobile-menu');
-      const menuIcon = document.getElementById('menu-icon');
-      if (menuBtn && mobileMenu) {
+      createGallery(GALLERIES.commercial);
+      createGallery(GALLERIES.artistic);
+      createPatternGallery('locations-grid', 'locations', 'location', 35);
+
+      // ---------- Mobile menu ----------
+      (function initMenu() {
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        if (!menuBtn || !mobileMenu || !menuIcon) return;
+
+        const HAMBURGER = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>';
+        const CLOSE = '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>';
+
+        function setOpen(open) {
+          mobileMenu.classList.toggle('hidden', !open);
+          mobileMenu.hidden = !open;
+          menuBtn.setAttribute('aria-expanded', String(open));
+          menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+          menuIcon.innerHTML = open ? CLOSE : HAMBURGER;
+        }
+
         menuBtn.addEventListener('click', () => {
-          const isHidden = mobileMenu.classList.toggle('hidden');
-          const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
-          menuBtn.setAttribute('aria-expanded', String(!expanded));
-          // swap icon between hamburger and X using inline SVG path replacement
-          if (!isHidden) {
-            // show menu: change to X
-            menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>';
-          } else {
-            // hamburger
-            menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>';
-          }
+          setOpen(mobileMenu.hidden);
         });
 
         mobileMenu.querySelectorAll('a').forEach(link => {
-          link.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-            menuBtn.setAttribute('aria-expanded', 'false');
-            // restore hamburger icon
-            menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>';
-          });
+          link.addEventListener('click', () => setOpen(false));
         });
-      }
+      })();
 
-      // Lightbox handlers
+      // ---------- Lightbox ----------
       const lightbox = document.getElementById('lightbox');
       const lbImage = document.getElementById('lightbox-image');
       const lbCloseBtn = document.getElementById('lightbox-close');
+      let lastFocused = null;
 
-      function openLightbox(src) {
+      function openLightbox(src, alt = '') {
         if (!lightbox || !lbImage) return;
+        lastFocused = document.activeElement;
         lbImage.src = src;
-        // Ensure any previous zoom state is cleared when opening a new image
+        lbImage.alt = alt;
         lbImage.classList.remove('zoomed');
-        lightbox.classList.remove('hidden');
-        lightbox.classList.add('flex');
+        lightbox.classList.add('is-open');
         lightbox.setAttribute('aria-hidden', 'false');
+        lbCloseBtn?.focus();
+        document.body.style.overflow = 'hidden';
       }
 
       function closeLightbox() {
         if (!lightbox) return;
-        lightbox.classList.add('hidden');
-        lightbox.classList.remove('flex');
+        lightbox.classList.remove('is-open');
         lightbox.setAttribute('aria-hidden', 'true');
         if (lbImage) {
           lbImage.src = '';
-          // remove zoom class and reset transform/cursor state
+          lbImage.alt = '';
           lbImage.classList.remove('zoomed');
-          lbImage.style.transform = '';
-          lbImage.style.cursor = '';
         }
+        document.body.style.overflow = '';
+        lastFocused?.focus();
       }
 
-      if (lbCloseBtn) lbCloseBtn.addEventListener('click', closeLightbox);
-      document.addEventListener('keydown', (e) => {
-        if (e.key === "Escape") closeLightbox();
+      lbCloseBtn?.addEventListener('click', closeLightbox);
+
+      lightbox?.addEventListener('click', e => {
+        if (e.target === lightbox) closeLightbox();
       });
 
-      // Toggle zoom on image click
-      if (lbImage) {
-        lbImage.addEventListener('click', () => {
-          // Toggle zoom only if an image is loaded
-          if (!lbImage.src) return;
-          lbImage.classList.toggle('zoomed');
-        });
-      }
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && lightbox?.classList.contains('is-open')) {
+          closeLightbox();
+        }
+      });
 
-      // Initialize galleries
-      createGallery('commercial-grid', commercialPhotos, "commercial");
-      createGallery('artistic-grid', artisticPhotos, "artistic");
-      // Attempt to load location images named location01.jpg, location02.jpg, ... from images/locations/
-      // the maxCount here is conservative; increase if you have more images.
-      createPatternGallery('locations-grid', 'locations', 'location', 35);
+      lbImage?.addEventListener('click', e => {
+        e.stopPropagation();
+        if (!lbImage.src) return;
+        lbImage.classList.toggle('zoomed');
+      });
 
-      // Contact form: AJAX submit to FormSubmit.co and simple UX feedback
-      const contactForm = document.getElementById('contact-form');
-      const contactFeedback = document.getElementById('contact-feedback');
-      const contactSubmit = document.getElementById('contact-submit');
+      // Expose for gallery handlers
+      window.openLightbox = openLightbox;
 
-      if (contactForm) {
-        contactForm.addEventListener('submit', async (e) => {
+      // ---------- Contact form ----------
+      (function initContact() {
+        const form = document.getElementById('contact-form');
+        const feedback = document.getElementById('contact-feedback');
+        const submitBtn = document.getElementById('contact-submit');
+        if (!form || !feedback || !submitBtn) return;
+
+        form.addEventListener('submit', async e => {
           e.preventDefault();
-          contactFeedback.textContent = '';
+          feedback.textContent = '';
 
-          // Simple client-side validation
-          const email = contactForm.querySelector('[name="email"]').value.trim();
-          const message = contactForm.querySelector('[name="message"]').value.trim();
-          const honey = contactForm.querySelector('[name="_honey"]').value;
-          if (honey) return; // bot filled honeypot
+          const honey = form.querySelector('[name="_honey"]')?.value;
+          if (honey) return;
+
+          const email = form.querySelector('[name="email"]')?.value.trim();
+          const message = form.querySelector('[name="message"]')?.value.trim();
+
           if (!email || !message) {
-            contactFeedback.textContent = 'Please provide both your email and a message.';
+            feedback.textContent = 'Please provide both your email and a message.';
             return;
           }
 
-          contactSubmit.disabled = true;
-          const originalText = contactSubmit.textContent;
-          contactSubmit.textContent = 'Sending...';
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            feedback.textContent = 'Please enter a valid email address.';
+            return;
+          }
+
+          submitBtn.disabled = true;
+          const originalText = submitBtn.textContent;
+          submitBtn.textContent = 'Sending...';
 
           try {
-            const formData = new FormData(contactForm);
-            const resp = await fetch(contactForm.action, {
+            const resp = await fetch(form.action, {
               method: 'POST',
-              body: formData,
-              headers: {
-                'Accept': 'application/json'
-              }
+              body: new FormData(form),
+              headers: { Accept: 'application/json' }
             });
-            const data = await resp.json();
-            if (data.success === 'true' || data.success === true || resp.ok) {
-              contactFeedback.textContent = 'Thanks — your message has been sent.';
-              contactForm.reset();
-            } else if (data.message) {
-              contactFeedback.textContent = data.message;
+            const data = await resp.json().catch(() => ({}));
+
+            if (data.success === true || data.success === 'true' || resp.ok) {
+              feedback.textContent = 'Thanks — your message has been sent.';
+              form.reset();
             } else {
-              contactFeedback.textContent = 'Sorry — there was a problem sending your message.';
+              feedback.textContent = data.message || 'Sorry — there was a problem sending your message.';
             }
           } catch (err) {
             console.error('Contact form error', err);
-            contactFeedback.textContent = 'Network error — please try again or email takenasread@photographer.net directly.';
+            feedback.textContent = 'Network error — please try again or email takenasread@photographer.net directly.';
           } finally {
-            contactSubmit.disabled = false;
-            contactSubmit.textContent = originalText;
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
           }
         });
-      }
-
+      })();
     });
   </script>
-
-  <!--
-    Further recommendations (production):
-    - Build Tailwind locally and purge unused classes; include a single small CSS file instead of the CDN script.
-    - Convert and serve images in WebP/AVIF and provide responsive srcset for different viewport sizes.
-    - Set proper Cache-Control headers on images and assets (far-future caching + immutable when filenames are hashed).
-    - Use a CDN for static images.
-    - Consider lazy-loading offscreen background images and avoid rotating very large hero images on the initial load.
-    - Add width/height or real intrinsic sizes for important images if you have them, to further reduce CLS.
-  -->
 </body>
 </html>
