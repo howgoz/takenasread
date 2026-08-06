@@ -13,9 +13,7 @@
   <link rel="icon" href="icon.png" type="image/png" sizes="16x16" />
   <link rel="apple-touch-icon" href="icon.png" />
 
-  <!-- Dev only. For production: build & purge Tailwind -->
   <script src="https://cdn.tailwindcss.com" defer></script>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
@@ -68,10 +66,7 @@
       transition: opacity var(--hero-transition), transform 0.6s ease;
       will-change: opacity, transform;
     }
-    .hero-layer.visible {
-      opacity: 1;
-      transform: scale(1);
-    }
+    .hero-layer.visible { opacity: 1; transform: scale(1); }
     .hero-overlay {
       position: absolute;
       inset: 0;
@@ -97,10 +92,7 @@
       outline-offset: 2px;
     }
 
-    #lightbox {
-      display: none;
-      touch-action: none;
-    }
+    #lightbox { display: none; touch-action: none; }
     #lightbox.is-open { display: flex; }
     #lightbox-image {
       max-width: 92%;
@@ -150,11 +142,61 @@
       z-index: 2;
     }
 
+    /* Slideshow overlay */
+    #slideshow {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: #000;
+      align-items: center;
+      justify-content: center;
+    }
+    #slideshow.is-open { display: flex; }
+    #slideshow-image {
+      max-width: 100%;
+      max-height: 100%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    #slideshow-image.visible { opacity: 1; }
+    .slideshow-ui {
+      position: absolute;
+      z-index: 3;
+      color: #fff;
+    }
+    #slideshow-close {
+      top: 1.25rem;
+      right: 1.25rem;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 9999px;
+      width: 2.75rem;
+      height: 2.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    #slideshow-close:hover { color: #fbbf24; }
+    #slideshow-label {
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.875rem;
+      color: #d4d4d8;
+      text-align: center;
+      padding: 0.35rem 0.75rem;
+      background: rgba(0,0,0,0.45);
+      border-radius: 9999px;
+    }
+
     @media (max-width: 640px) {
-      .lightbox-nav {
-        width: 2.5rem;
-        height: 2.5rem;
-      }
+      .lightbox-nav { width: 2.5rem; height: 2.5rem; }
       .lightbox-nav.prev { left: 0.5rem; }
       .lightbox-nav.next { right: 0.5rem; }
     }
@@ -191,6 +233,24 @@
     }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .muted { color: var(--muted); }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .nav-btn:hover,
+    .nav-btn:focus-visible {
+      color: #fbbf24;
+      border-color: #fbbf24;
+      outline: none;
+    }
   </style>
 </head>
 <body class="bg-zinc-950 text-white">
@@ -198,37 +258,41 @@
   <a href="#main" class="skip-link">Skip to content</a>
 
   <nav class="bg-black/95 backdrop-blur-md" aria-label="Main">
-    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
-      <a href="#" class="text-2xl tracking-widest no-underline text-white hover:text-amber-400 transition">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center gap-4">
+      <a href="#" class="text-2xl tracking-widest no-underline text-white hover:text-amber-400 transition shrink-0">
         TAKEN AS READ
       </a>
 
-      <div class="hidden md:flex space-x-8 text-sm">
+      <div class="hidden md:flex items-center space-x-6 text-sm">
         <a href="about.html" class="hover:text-amber-400 transition">About</a>
-        <a href="#commercial" class="hover:text-amber-400 transition">Commercial</a>
         <a href="#artistic" class="hover:text-amber-400 transition">Artistic</a>
+        <a href="#commercial" class="hover:text-amber-400 transition">Commercial</a>
         <a href="#locations" class="hover:text-amber-400 transition">Locations</a>
         <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
+        <button type="button" id="slideshow-btn" class="nav-btn">Slideshow</button>
       </div>
 
-      <button
-        id="menu-btn"
-        class="md:hidden text-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
-        aria-expanded="false"
-        aria-controls="mobile-menu"
-        aria-label="Open menu"
-        type="button"
-      >
-        <svg id="menu-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-      </button>
+      <div class="flex items-center gap-3 md:hidden">
+        <button type="button" id="slideshow-btn-mobile" class="nav-btn text-xs">Slideshow</button>
+        <button
+          id="menu-btn"
+          class="text-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+          aria-label="Open menu"
+          type="button"
+        >
+          <svg id="menu-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div id="mobile-menu" class="hidden md:hidden flex flex-col items-center text-lg bg-zinc-950 py-8 border-t border-zinc-800" hidden>
       <a href="about.html" class="hover:text-amber-400 py-3">About</a>
-      <a href="#commercial" class="hover:text-amber-400 py-3">Commercial</a>
       <a href="#artistic" class="hover:text-amber-400 py-3">Artistic</a>
+      <a href="#commercial" class="hover:text-amber-400 py-3">Commercial</a>
       <a href="#locations" class="hover:text-amber-400 py-3">Locations</a>
       <a href="#contact" class="hover:text-amber-400 py-3">Contact</a>
     </div>
@@ -245,14 +309,15 @@
       </div>
     </section>
 
-    <section id="commercial" class="max-w-6xl mx-auto px-6 py-20">
-      <h2 class="text-4xl font-light mb-12 text-center">Commercial Work</h2>
-      <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="commercial-grid"></div>
-    </section>
-
-    <section id="artistic" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
+    <!-- Order: Artistic → Commercial → Locations -->
+    <section id="artistic" class="max-w-6xl mx-auto px-6 py-20">
       <h2 class="text-4xl font-light mb-12 text-center">Artistic Work</h2>
       <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="artistic-grid"></div>
+    </section>
+
+    <section id="commercial" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
+      <h2 class="text-4xl font-light mb-12 text-center">Commercial Work</h2>
+      <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="commercial-grid"></div>
     </section>
 
     <section id="locations" class="max-w-6xl mx-auto px-6 py-20">
@@ -310,6 +375,9 @@
     © Taken as Read Photography
   </footer>
 
+  <!-- Background music: only used during slideshow -->
+  <audio id="bg-audio" src="housego_horizontal(web).mp3" loop preload="metadata" playsinline></audio>
+
   <!-- Lightbox -->
   <div
     id="lightbox"
@@ -319,37 +387,38 @@
     aria-label="Image preview"
     aria-hidden="true"
   >
-    <button
-      id="lightbox-close"
-      type="button"
-      class="absolute top-8 right-8 text-white cursor-pointer hover:text-amber-400 focus-visible:ring-2 focus-visible:ring-amber-400 rounded z-10"
-      aria-label="Close"
-    >
+    <button id="lightbox-close" type="button" class="absolute top-8 right-8 text-white cursor-pointer hover:text-amber-400 focus-visible:ring-2 focus-visible:ring-amber-400 rounded z-10" aria-label="Close">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
       </svg>
     </button>
-
     <button type="button" id="lightbox-prev" class="lightbox-nav prev" aria-label="Previous image">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
       </svg>
     </button>
-
     <img id="lightbox-image" src="" alt="" class="border-8 border-white shadow-2xl" draggable="false" />
-
     <button type="button" id="lightbox-next" class="lightbox-nav next" aria-label="Next image">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
       </svg>
     </button>
-
     <div id="lightbox-counter" class="lightbox-counter" aria-live="polite"></div>
+  </div>
+
+  <!-- Slideshow -->
+  <div id="slideshow" role="dialog" aria-modal="true" aria-label="Slideshow" aria-hidden="true">
+    <button type="button" id="slideshow-close" class="slideshow-ui" aria-label="Exit slideshow">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+    <img id="slideshow-image" src="" alt="" />
+    <div id="slideshow-label" class="slideshow-ui" aria-live="polite"></div>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // ---------- Config ----------
       const HERO_IMAGES = [
         'images/background.JPG',
         'images/background2.JPG',
@@ -366,16 +435,9 @@
       ];
       const HERO_INTERVAL_MS = 7000;
       const HERO_FADE_MS = 1200;
+      const SLIDESHOW_INTERVAL_MS = 7000; // time per slide
 
       const GALLERIES = {
-        commercial: {
-          containerId: 'commercial-grid',
-          folder: 'commercial',
-          photos: [
-            'bdance-5.jpg', 'blackford.jpg', 'blackford-pavilion-pergola.jpg', 'dance.jpg',
-            'fire-hydrant-three.jpg', 'st-roque.jpg', 'wedding.jpg'
-          ]
-        },
         artistic: {
           containerId: 'artistic-grid',
           folder: 'artistic',
@@ -384,13 +446,27 @@
             'water-1.jpg', 'water-2.jpg', 'water-3.jpg', 'water-4.jpg', 'water-5.jpg',
             'swoosh.jpg', 'kilgraston.jpg', 'reflections.jpg'
           ]
+        },
+        commercial: {
+          containerId: 'commercial-grid',
+          folder: 'commercial',
+          photos: [
+            'bdance-5.jpg', 'blackford.jpg', 'blackford-pavilion-pergola.jpg', 'dance.jpg',
+            'fire-hydrant-three.jpg', 'st-roque.jpg', 'wedding.jpg'
+          ]
         }
       };
 
       const lightboxItems = [];
       let lightboxIndex = 0;
 
-      // ---------- Utilities ----------
+      // Full slideshow list: backgrounds + all gallery images (filled as galleries load)
+      const slideshowItems = HERO_IMAGES.map(src => ({
+        src,
+        alt: 'Background',
+        label: 'Background'
+      }));
+
       function preloadImage(src) {
         return new Promise((resolve, reject) => {
           const img = new Image();
@@ -428,18 +504,13 @@
           try {
             await setLayerImage(visibleLayer, HERO_IMAGES[currentIndex]);
             layers[visibleLayer].classList.add('visible');
-
-            HERO_IMAGES.slice(1).forEach(src => {
-              const img = new Image();
-              img.src = src;
-            });
+            HERO_IMAGES.slice(1).forEach(src => { const img = new Image(); img.src = src; });
 
             setInterval(async () => {
               if (rotating) return;
               rotating = true;
               const nextIndex = (currentIndex + 1) % HERO_IMAGES.length;
               const hiddenLayer = 1 - visibleLayer;
-
               try {
                 await setLayerImage(hiddenLayer, HERO_IMAGES[nextIndex]);
                 layers[hiddenLayer].classList.add('visible');
@@ -458,11 +529,10 @@
             console.warn('Hero background setup failed', e);
           }
         }
-
         start();
       })();
 
-      // ---------- Lightbox (swipe + pinch-zoom + pan) ----------
+      // ---------- Lightbox (same as before) ----------
       const lightbox = document.getElementById('lightbox');
       const lbImage = document.getElementById('lightbox-image');
       const lbCloseBtn = document.getElementById('lightbox-close');
@@ -471,7 +541,6 @@
       const lbCounter = document.getElementById('lightbox-counter');
       let lastFocused = null;
 
-      // Transform state
       const MIN_SCALE = 1;
       const MAX_SCALE = 4;
       const DOUBLE_TAP_SCALE = 2;
@@ -479,7 +548,6 @@
       let translateX = 0;
       let translateY = 0;
 
-      // Gesture state
       const SWIPE_THRESHOLD = 50;
       const SWIPE_MAX_VERTICAL = 80;
       let touchStartX = 0;
@@ -487,20 +555,14 @@
       let touchStartTime = 0;
       let isSwiping = false;
       let suppressClick = false;
-
-      // Pinch
       let isPinching = false;
       let pinchStartDist = 0;
       let pinchStartScale = 1;
-
-      // Pan (one finger while zoomed)
       let isPanning = false;
       let panStartX = 0;
       let panStartY = 0;
       let panOriginX = 0;
       let panOriginY = 0;
-
-      // Double-tap
       let lastTapTime = 0;
       let lastTapX = 0;
       let lastTapY = 0;
@@ -526,11 +588,6 @@
           translateY = 0;
           return;
         }
-        const rect = lbImage.getBoundingClientRect();
-        // Approximate max pan from scaled size vs viewport
-        const maxX = Math.max(0, (rect.width - window.innerWidth) / 2 + 40);
-        const maxY = Math.max(0, (rect.height - window.innerHeight) / 2 + 40);
-        // Use unscaled natural display size for more stable limits
         const displayW = lbImage.offsetWidth * scale;
         const displayH = lbImage.offsetHeight * scale;
         const limitX = Math.max(0, (displayW - window.innerWidth) / 2);
@@ -541,11 +598,9 @@
 
       function updateCounter() {
         if (!lbCounter) return;
-        if (!lightboxItems.length) {
-          lbCounter.textContent = '';
-          return;
-        }
-        lbCounter.textContent = `${lightboxIndex + 1} / ${lightboxItems.length}`;
+        lbCounter.textContent = lightboxItems.length
+          ? `${lightboxIndex + 1} / ${lightboxItems.length}`
+          : '';
       }
 
       function showLightboxImage(index) {
@@ -560,13 +615,11 @@
 
       function openLightbox(src, alt = '') {
         if (!lightbox || !lbImage) return;
-
         let index = lightboxItems.findIndex(item => item.src === src);
         if (index === -1) {
           lightboxItems.push({ src, alt });
           index = lightboxItems.length - 1;
         }
-
         lastFocused = document.activeElement;
         showLightboxImage(index);
         lightbox.classList.add('is-open');
@@ -600,34 +653,22 @@
       }
 
       function distance(t0, t1) {
-        const dx = t0.clientX - t1.clientX;
-        const dy = t0.clientY - t1.clientY;
-        return Math.hypot(dx, dy);
+        return Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
       }
 
       lbCloseBtn?.addEventListener('click', closeLightbox);
-      lbPrevBtn?.addEventListener('click', e => {
-        e.stopPropagation();
-        lightboxPrev();
-      });
-      lbNextBtn?.addEventListener('click', e => {
-        e.stopPropagation();
-        lightboxNext();
-      });
-
+      lbPrevBtn?.addEventListener('click', e => { e.stopPropagation(); lightboxPrev(); });
+      lbNextBtn?.addEventListener('click', e => { e.stopPropagation(); lightboxNext(); });
       lightbox?.addEventListener('click', e => {
         if (e.target === lightbox && scale <= 1.01) closeLightbox();
       });
 
       document.addEventListener('keydown', e => {
+        if (slideshow?.classList.contains('is-open')) return; // slideshow handles its own keys
         if (!lightbox?.classList.contains('is-open')) return;
-
         if (e.key === 'Escape') {
-          if (scale > 1.01) {
-            resetTransform();
-          } else {
-            closeLightbox();
-          }
+          if (scale > 1.01) resetTransform();
+          else closeLightbox();
         } else if (e.key === 'ArrowLeft') {
           e.preventDefault();
           if (scale <= 1.01) lightboxPrev();
@@ -637,13 +678,11 @@
         }
       });
 
-      // Desktop click toggle zoom
       lbImage?.addEventListener('click', e => {
         e.stopPropagation();
         if (!lbImage.src || suppressClick) return;
-        if (scale > 1.01) {
-          resetTransform();
-        } else {
+        if (scale > 1.01) resetTransform();
+        else {
           scale = DOUBLE_TAP_SCALE;
           translateX = 0;
           translateY = 0;
@@ -651,12 +690,9 @@
         }
       });
 
-      // ---------- Touch: swipe / pinch / pan / double-tap ----------
       function onTouchStart(e) {
         if (!lightbox?.classList.contains('is-open')) return;
-
         if (e.touches.length === 2) {
-          // Start pinch
           isPinching = true;
           isPanning = false;
           isSwiping = false;
@@ -664,16 +700,13 @@
           pinchStartScale = scale;
           return;
         }
-
         if (e.touches.length !== 1) return;
-
         const t = e.touches[0];
         touchStartX = t.clientX;
         touchStartY = t.clientY;
         touchStartTime = Date.now();
         isSwiping = false;
         suppressClick = false;
-
         if (scale > 1.01) {
           isPanning = true;
           panStartX = t.clientX;
@@ -686,33 +719,24 @@
 
       function onTouchMove(e) {
         if (!lightbox?.classList.contains('is-open')) return;
-
-        // Pinch zoom
         if (e.touches.length === 2 && isPinching) {
           e.preventDefault();
           const dist = distance(e.touches[0], e.touches[1]);
           if (pinchStartDist > 0) {
-            const next = pinchStartScale * (dist / pinchStartDist);
-            scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, next));
+            scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchStartScale * (dist / pinchStartDist)));
             if (scale <= 1.01) {
               scale = 1;
               translateX = 0;
               translateY = 0;
-            } else {
-              clampPan();
-            }
+            } else clampPan();
             applyTransform();
           }
           return;
         }
-
         if (e.touches.length !== 1 || !touchStartTime) return;
-
         const t = e.touches[0];
         const dx = t.clientX - touchStartX;
         const dy = t.clientY - touchStartY;
-
-        // Pan when zoomed
         if (isPanning && scale > 1.01) {
           e.preventDefault();
           translateX = panOriginX + (t.clientX - panStartX);
@@ -721,8 +745,6 @@
           applyTransform();
           return;
         }
-
-        // Horizontal swipe candidate when not zoomed
         if (scale <= 1.01 && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
           isSwiping = true;
           e.preventDefault();
@@ -731,8 +753,6 @@
 
       function onTouchEnd(e) {
         if (!lightbox?.classList.contains('is-open')) return;
-
-        // End of pinch (may still have 1 finger left)
         if (isPinching && e.touches.length < 2) {
           isPinching = false;
           if (scale < 1.05) resetTransform();
@@ -741,30 +761,24 @@
           suppressClick = true;
           setTimeout(() => { suppressClick = false; }, 80);
         }
-
         if (isPanning) {
           isPanning = false;
           lbImage?.classList.remove('dragging');
         }
-
-        // Only evaluate swipe / double-tap when no fingers remain
-        if (e.touches.length > 0) return;
-        if (!touchStartTime) return;
-
+        if (e.touches.length > 0 || !touchStartTime) return;
         const t = e.changedTouches[0];
         const dx = t.clientX - touchStartX;
         const dy = t.clientY - touchStartY;
         const dt = Date.now() - touchStartTime;
         touchStartTime = 0;
 
-        // Swipe between images (not zoomed)
         if (scale <= 1.01 && !isPinching) {
-          const isHorizontal = Math.abs(dx) > Math.abs(dy);
-          const farEnough = Math.abs(dx) >= SWIPE_THRESHOLD;
-          const notTooVertical = Math.abs(dy) <= SWIPE_MAX_VERTICAL;
-          const quickEnough = dt < 600;
-
-          if (isHorizontal && farEnough && notTooVertical && quickEnough) {
+          if (
+            Math.abs(dx) > Math.abs(dy) &&
+            Math.abs(dx) >= SWIPE_THRESHOLD &&
+            Math.abs(dy) <= SWIPE_MAX_VERTICAL &&
+            dt < 600
+          ) {
             if (dx > 0) lightboxPrev();
             else lightboxNext();
             suppressClick = true;
@@ -774,21 +788,15 @@
           }
         }
 
-        // Double-tap to zoom (mobile)
         const now = Date.now();
-        const tapDx = Math.abs(t.clientX - lastTapX);
-        const tapDy = Math.abs(t.clientY - lastTapY);
         if (
-          dt < 300 &&
-          Math.abs(dx) < 12 &&
-          Math.abs(dy) < 12 &&
+          dt < 300 && Math.abs(dx) < 12 && Math.abs(dy) < 12 &&
           now - lastTapTime < 300 &&
-          tapDx < 40 &&
-          tapDy < 40
+          Math.abs(t.clientX - lastTapX) < 40 &&
+          Math.abs(t.clientY - lastTapY) < 40
         ) {
-          if (scale > 1.01) {
-            resetTransform();
-          } else {
+          if (scale > 1.01) resetTransform();
+          else {
             scale = DOUBLE_TAP_SCALE;
             translateX = 0;
             translateY = 0;
@@ -802,7 +810,6 @@
           lastTapX = t.clientX;
           lastTapY = t.clientY;
         }
-
         isSwiping = false;
       }
 
@@ -820,16 +827,17 @@
       }
 
       // ---------- Galleries ----------
-      function createGallery({ containerId, folder, photos }) {
+      function createGallery({ containerId, folder, photos, sectionLabel }) {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.replaceChildren();
-
         const fragment = document.createDocumentFragment();
+
         photos.forEach(filename => {
           const src = `images/${folder}/${filename}`;
           const alt = filenameToAlt(filename);
           lightboxItems.push({ src, alt });
+          slideshowItems.push({ src, alt, label: sectionLabel });
 
           const img = document.createElement('img');
           img.src = src;
@@ -850,11 +858,10 @@
         container.appendChild(fragment);
       }
 
-      async function createPatternGallery(containerId, folder, prefix, maxCount) {
+      async function createPatternGallery(containerId, folder, prefix, maxCount, sectionLabel) {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.replaceChildren();
-
         const fragment = document.createDocumentFragment();
         let loaded = 0;
 
@@ -866,6 +873,7 @@
             .then(() => {
               const alt = filenameToAlt(filename);
               lightboxItems.push({ src, alt });
+              slideshowItems.push({ src, alt, label: sectionLabel });
 
               const img = document.createElement('img');
               img.src = src;
@@ -888,16 +896,117 @@
         });
 
         await Promise.all(checks);
-        if (loaded) {
-          container.appendChild(fragment);
-        } else {
-          container.innerHTML = '<p class="muted text-center">No location images found.</p>';
-        }
+        if (loaded) container.appendChild(fragment);
+        else container.innerHTML = '<p class="muted text-center">No location images found.</p>';
       }
 
-      createGallery(GALLERIES.commercial);
-      createGallery(GALLERIES.artistic);
-      createPatternGallery('locations-grid', 'locations', 'location', 35);
+      // Artistic → Commercial → Locations (matches page order)
+      createGallery({ ...GALLERIES.artistic, sectionLabel: 'Artistic' });
+      createGallery({ ...GALLERIES.commercial, sectionLabel: 'Commercial' });
+      createPatternGallery('locations-grid', 'locations', 'location', 35, 'Locations');
+
+      // ---------- Slideshow + audio ----------
+      const slideshow = document.getElementById('slideshow');
+      const ssImage = document.getElementById('slideshow-image');
+      const ssLabel = document.getElementById('slideshow-label');
+      const ssClose = document.getElementById('slideshow-close');
+      const bgAudio = document.getElementById('bg-audio');
+      const ssBtn = document.getElementById('slideshow-btn');
+      const ssBtnMobile = document.getElementById('slideshow-btn-mobile');
+
+      let ssIndex = 0;
+      let ssTimer = null;
+      let ssRunning = false;
+
+      if (bgAudio) {
+        bgAudio.volume = 0.2;
+        bgAudio.loop = true;
+      }
+
+      function setSlide(index) {
+        if (!slideshowItems.length || !ssImage) return;
+        ssIndex = (index + slideshowItems.length) % slideshowItems.length;
+        const item = slideshowItems[ssIndex];
+
+        ssImage.classList.remove('visible');
+        // brief fade: wait a tick then swap and fade in
+        window.setTimeout(() => {
+          ssImage.src = item.src;
+          ssImage.alt = item.alt || '';
+          if (ssLabel) {
+            ssLabel.textContent = `${item.label || ''} · ${ssIndex + 1} / ${slideshowItems.length}`;
+          }
+          // force reflow then fade in
+          void ssImage.offsetWidth;
+          ssImage.classList.add('visible');
+        }, 200);
+      }
+
+      async function startSlideshow() {
+        if (!slideshowItems.length) {
+          alert('No images available for the slideshow yet.');
+          return;
+        }
+        // Close lightbox if open
+        if (lightbox?.classList.contains('is-open')) closeLightbox();
+
+        ssRunning = true;
+        slideshow.classList.add('is-open');
+        slideshow.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        setSlide(0);
+
+        if (ssTimer) clearInterval(ssTimer);
+        ssTimer = setInterval(() => setSlide(ssIndex + 1), SLIDESHOW_INTERVAL_MS);
+
+        if (bgAudio) {
+          try {
+            bgAudio.currentTime = 0;
+            await bgAudio.play();
+          } catch (err) {
+            console.warn('Slideshow audio could not start', err);
+          }
+        }
+        ssClose?.focus();
+      }
+
+      function stopSlideshow() {
+        ssRunning = false;
+        if (ssTimer) {
+          clearInterval(ssTimer);
+          ssTimer = null;
+        }
+        slideshow?.classList.remove('is-open');
+        slideshow?.setAttribute('aria-hidden', 'true');
+        if (ssImage) {
+          ssImage.classList.remove('visible');
+          ssImage.src = '';
+        }
+        if (ssLabel) ssLabel.textContent = '';
+        if (bgAudio) {
+          bgAudio.pause();
+          bgAudio.currentTime = 0;
+        }
+        document.body.style.overflow = '';
+      }
+
+      ssBtn?.addEventListener('click', startSlideshow);
+      ssBtnMobile?.addEventListener('click', startSlideshow);
+      ssClose?.addEventListener('click', stopSlideshow);
+
+      document.addEventListener('keydown', e => {
+        if (!ssRunning) return;
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          stopSlideshow();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          setSlide(ssIndex + 1);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          setSlide(ssIndex - 1);
+        }
+      });
 
       // ---------- Mobile menu ----------
       (function initMenu() {
@@ -917,10 +1026,7 @@
           menuIcon.innerHTML = open ? CLOSE : HAMBURGER;
         }
 
-        menuBtn.addEventListener('click', () => {
-          setOpen(mobileMenu.hidden);
-        });
-
+        menuBtn.addEventListener('click', () => setOpen(mobileMenu.hidden));
         mobileMenu.querySelectorAll('a').forEach(link => {
           link.addEventListener('click', () => setOpen(false));
         });
@@ -936,18 +1042,14 @@
         form.addEventListener('submit', async e => {
           e.preventDefault();
           feedback.textContent = '';
-
-          const honey = form.querySelector('[name="_honey"]')?.value;
-          if (honey) return;
+          if (form.querySelector('[name="_honey"]')?.value) return;
 
           const email = form.querySelector('[name="email"]')?.value.trim();
           const message = form.querySelector('[name="message"]')?.value.trim();
-
           if (!email || !message) {
             feedback.textContent = 'Please provide both your email and a message.';
             return;
           }
-
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             feedback.textContent = 'Please enter a valid email address.';
             return;
@@ -964,7 +1066,6 @@
               headers: { Accept: 'application/json' }
             });
             const data = await resp.json().catch(() => ({}));
-
             if (data.success === true || data.success === 'true' || resp.ok) {
               feedback.textContent = 'Thanks — your message has been sent.';
               form.reset();
