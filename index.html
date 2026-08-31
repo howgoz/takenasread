@@ -311,12 +311,12 @@
 
     <!-- Order: Artistic → Commercial → Locations -->
     <section id="artistic" class="max-w-6xl mx-auto px-6 py-20">
-      <h2 class="text-4xl font-light mb-12 text-center">Artistic Work</h2>
+      <h2 class="text-4xl font-light mb-12 text-center">Artistic</h2>
       <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="artistic-grid"></div>
     </section>
 
     <section id="commercial" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
-      <h2 class="text-4xl font-light mb-12 text-center">Commercial Work</h2>
+      <h2 class="text-4xl font-light mb-12 text-center">Commercial</h2>
       <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="commercial-grid"></div>
     </section>
 
@@ -451,8 +451,8 @@
           containerId: 'commercial-grid',
           folder: 'commercial',
           photos: [
-            'bdance-5.jpg', 'blackford.jpg', 'blackford-pavilion-pergola.jpg', 'dance.jpg',
-            'fire-hydrant-three.jpg', 'st-roque.jpg', 'wedding.jpg', 'dance2.jpg', 'dance3.jpg'
+            'angelos1.jpg', 'angelos2.jpg', 'bdance-5.jpg', 'blackford.jpg', 'blackford-pavilion-pergola.jpg', 'dance.jpg',
+            'fire-hydrant-three.jpg', 'st-roque.jpg', 'wedding.jpg', 'dance2.jpg', 'dance3.jpg', 'magic.jpg'
           ]
         }
       };
@@ -903,7 +903,7 @@
       // Artistic → Commercial → Locations (matches page order)
       createGallery({ ...GALLERIES.artistic, sectionLabel: 'Artistic' });
       createGallery({ ...GALLERIES.commercial, sectionLabel: 'Commercial' });
-      createPatternGallery('locations-grid', 'locations', 'location', 35, 'Locations');
+      createPatternGallery('locations-grid', 'locations', 'location', 36, 'Locations');
 
       // ---------- Slideshow + audio ----------
       const slideshow = document.getElementById('slideshow');
