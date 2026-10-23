@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Taken as Read — photography portfolio: commercial, artistic, and location work." />
+  <meta name="description" content="Taken as Read — photography portfolio: Work, artistic, and location work." />
   <title>Taken as Read</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -266,7 +266,7 @@
       <div class="hidden md:flex items-center space-x-6 text-sm">
         <a href="about.html" class="hover:text-amber-400 transition">About</a>
         <a href="#artistic" class="hover:text-amber-400 transition">Artistic</a>
-        <a href="#commercial" class="hover:text-amber-400 transition">Commercial</a>
+        <a href="#Work" class="hover:text-amber-400 transition">Work</a>
         <a href="#locations" class="hover:text-amber-400 transition">Locations</a>
         <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
         <button type="button" id="slideshow-btn" class="nav-btn">Slideshow</button>
@@ -292,7 +292,7 @@
     <div id="mobile-menu" class="hidden md:hidden flex flex-col items-center text-lg bg-zinc-950 py-8 border-t border-zinc-800" hidden>
       <a href="about.html" class="hover:text-amber-400 py-3">About</a>
       <a href="#artistic" class="hover:text-amber-400 py-3">Artistic</a>
-      <a href="#commercial" class="hover:text-amber-400 py-3">Commercial</a>
+      <a href="#Work" class="hover:text-amber-400 py-3">Work</a>
       <a href="#locations" class="hover:text-amber-400 py-3">Locations</a>
       <a href="#contact" class="hover:text-amber-400 py-3">Contact</a>
     </div>
@@ -309,15 +309,15 @@
       </div>
     </section>
 
-    <!-- Order: Artistic → Commercial → Locations -->
+    <!-- Order: Artistic → Work → Locations -->
     <section id="artistic" class="max-w-6xl mx-auto px-6 py-20">
       <h2 class="text-4xl font-light mb-12 text-center">Artistic</h2>
       <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="artistic-grid"></div>
     </section>
 
-    <section id="commercial" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
-      <h2 class="text-4xl font-light mb-12 text-center">Commercial</h2>
-      <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="commercial-grid"></div>
+    <section id="Work" class="max-w-6xl mx-auto px-6 py-20 bg-zinc-900">
+      <h2 class="text-4xl font-light mb-12 text-center">Work</h2>
+      <div class="photo-grid grid grid-cols-1 md:grid-cols-3 gap-6" id="Work-grid"></div>
     </section>
 
     <section id="locations" class="max-w-6xl mx-auto px-6 py-20">
@@ -443,16 +443,16 @@
           folder: 'artistic',
           photos: [
             'flowers-1.jpg', 'flowers-2.jpg', 'modern-1.jpg', 'modern-2.jpg',
-            'water-1.jpg', 'water-2.jpg', 'water-3.jpg', 'water-4.jpg', 'water-5.jpg',
+            'water-1.jpg', 'water-2.jpg', 'umb1.jpg', 'water-4.jpg', 'water-5.jpg',
             'swoosh.jpg', 'kilgraston.jpg', 'reflections.jpg'
           ]
         },
-        commercial: {
-          containerId: 'commercial-grid',
-          folder: 'commercial',
+        Work: {
+          containerId: 'Work-grid',
+          folder: 'Work',
           photos: [
-            'angelos1.jpg', 'angelos2.jpg', 'bdance-5.jpg', 'blackford.jpg', 'blackford-pavilion-pergola.jpg', 'dance.jpg',
-            'fire-hydrant-three.jpg', 'st-roque.jpg', 'wedding.jpg', 'dance2.jpg', 'dance3.jpg', 'magic.jpg'
+            'angelos1.jpg', 'bdance-6.jpg', 'bdance-5.jpg', 'blackford.jpg', 'blackford-pavilion-pergola.jpg', 'dance.jpg',
+            'dance2.jpg', 'h2.jpg', 'h3.jpg', 'h1.jpg', 'wedding.jpg', 'wedding2.jpg'
           ]
         }
       };
@@ -900,9 +900,9 @@
         else container.innerHTML = '<p class="muted text-center">No location images found.</p>';
       }
 
-      // Artistic → Commercial → Locations (matches page order)
+      // Artistic → Work → Locations (matches page order)
       createGallery({ ...GALLERIES.artistic, sectionLabel: 'Artistic' });
-      createGallery({ ...GALLERIES.commercial, sectionLabel: 'Commercial' });
+      createGallery({ ...GALLERIES.Work, sectionLabel: 'Work' });
       createPatternGallery('locations-grid', 'locations', 'location', 36, 'Locations');
 
       // ---------- Slideshow + audio ----------
